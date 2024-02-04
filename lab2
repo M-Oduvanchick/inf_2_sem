@@ -1,0 +1,39 @@
+#include <iostream>
+#include <stdlib.h>
+using namespace std;
+const int n = 11;
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	int a[n];
+	int r;
+	int p = 3;
+	int q = 7;
+	int i = p;
+	int j = q;
+	srand(time(NULL));
+
+	for (int i = 0; i < n; i++)
+	{
+		a[i] = rand() % 100 - 50;
+		cout << a[i] << ' ';
+	}
+
+	cout << endl;
+
+	while (i < j)
+	{
+		r = a[i];
+		a[i] = a[j];
+		a[j] = r;
+		i++;
+		j--;
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		cout << a[i] << ' ';
+	}
+
+	return 0;
+}
