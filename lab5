@@ -1,0 +1,59 @@
+#include <iostream>
+#include <clocale>
+#include <stdlib.h>
+#include <ctime>
+using namespace std;
+const int n = 3;
+const int m = 3;
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	srand(time(0));
+	int a[n][m];
+	int min, M;
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			a[i][j] = rand() % 10 - 5;
+			cout << a[i][j] << ' ';
+		}
+		cout << endl;
+	}
+	cout << endl;
+	
+	min = 10;
+	
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			if (a[i][j] < min)
+			{
+				M = 0;
+
+				for (int k = 0; k < n; k++)
+				{
+					for (int l = 0; l < m; l++)
+					{
+						if (a[k][l] == a[i][j])
+						{
+							M++;
+						}
+
+					}
+				}
+				if (M == 1)
+					min = a[i][j];
+			}
+		}
+	}
+	if (min == 10)
+		cout << "Неповторяющихся нет.";
+	else 
+		cout << min;
+
+	return 0;
+}
