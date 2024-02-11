@@ -1,0 +1,35 @@
+#include <iostream>
+#include <cmath>
+#include <math.h>
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	double x;
+	int n;
+	double sum = 0, u = 0;
+	int f = 1;
+
+	cout << "Введите n: ";
+	cin >> n;
+	cout << "Введите x: ";
+	cin >> x;
+	sum = sum + 1;
+
+	for (int i = 1; i <= n - 1; i++)
+	{
+		for (int j = 1; j <= i; j++)
+		{
+			f = f * j;
+		}
+		double a = pow(x / 2, i);
+		u = (((i * i) + 1) / (double)f) * (pow(x / 2, i));
+
+		sum = sum + u;
+		cout << u << endl;
+	}
+	cout << endl;
+	cout << "Сумма равна: " << sum<< endl;
+	return 0;
+}
