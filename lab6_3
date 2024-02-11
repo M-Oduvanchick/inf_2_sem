@@ -1,0 +1,26 @@
+#include <iostream>
+using namespace std;
+
+void han(int n, int start, int end)
+{
+	
+	int temp;
+	if (n == 1)
+		cout << "Перемещение 1 диска с " << start << " на " << end << endl;
+	else
+	{
+		temp = 6 - start - end;
+		han(n - 1, start, temp);
+		cout << "Перемещение " << n << " диска с " << start << " на " << temp<< endl;
+		han(n - 1, temp, end);
+	}
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+
+	han(4, 1, 2);
+	
+	return 0;
+}
