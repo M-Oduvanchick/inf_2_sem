@@ -1,0 +1,59 @@
+#include<iostream>
+#include<cstdlib>
+#include<ctime>
+#include<string>
+#include<stdio.h>
+
+using namespace std;
+int p;
+
+int fun(const int* arr, int p)
+{
+	int s = 0;
+
+	for (int i = 0; i < p; i++)
+	{
+		if (arr[i] % 2 == 0)
+			s++;
+	}
+	return s;
+}
+
+int fun(char* str)
+{
+	int s = 0;
+
+	for (int i = 0; i < p; i++)
+	{
+		if (str[i] == ' ')
+		{
+			if (str[i + 1] == 'а')
+				s++;
+		}
+	}
+	return s;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	system("chcp1254");
+	system("cls");
+	const int n = 10;
+	int a[n];
+	char str[] = " арбуз лама сок лампа лен ананас курс сок ангел игра";
+	srand(time(NULL));
+
+	for (int i = 0; i < n; i++)
+	{
+		a[i] = rand() % 10;
+		cout << a[i] << ' ';
+	}
+	cout << endl;
+	cout << "Четных чисел: " << fun(a, n) << endl;
+
+	p = strlen(str);
+	cout << "Всего слов: " << fun(str)  << endl;
+
+	return 0;
+}
