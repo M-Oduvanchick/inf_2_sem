@@ -1,0 +1,48 @@
+#include <iostream>
+#include <string>
+using namespace std;
+const int l = 4;
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	string str = "THERE_IS_A_TABLE";
+	string str1 = "IS";
+	string str2 = "A";
+	string str3 = "THERE";
+
+	cout << "Введите предложение: ";
+	cin >> str;
+	int n = size(str);
+	
+	string a[l];
+	int j = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (str[i] == '_')
+		{
+			j++;
+		}
+		else
+			a[j] += str[i];
+	}
+	for (int i = 0; i < l; i++)
+	{
+		if (a[i] == str1)
+			a[i] = "";
+		if (a[i] == str2)
+			a[i] = "";
+		if (a[i] == str3)
+			a[i] = "ЗДЕСЬ";
+	}
+	str = "";
+	for (int i = 0; i < l; i++)
+	{
+		str += a[i];
+		if (a[i] != "" && i!=l-1)
+		{
+			str += "_";
+		}
+	}
+	cout << str << endl;
+	return 0;
+}
