@@ -1,0 +1,51 @@
+#include <iostream>
+#include <stdarg.h>
+using namespace std;
+
+int triangle(int m, ...)
+{
+    int a, b, c;
+    int s = 0;
+    int* ptr = &m + 1;
+    for (; m > 0; m--)
+    {
+        a = *(ptr + 1);
+        b = *(ptr + 3);
+        c = *(ptr + 5);
+
+        if (a * a + b * b >= c * c)
+        {
+            if (a * a + c * c >= b * b)
+            {
+                if (b * b + c * c >= a * a)
+                {
+                    s++;
+                }
+            }
+        }
+
+        ptr = ptr + 2;
+    }
+    return s;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "");
+    int a1, a2, a3;
+    int b1, b2, b3, b4, b5, b6, b7, b8, b9;
+    int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11;
+    
+    cout << "Введите три числа: " << endl;
+    cin >> a1 >> a2 >> a3;
+    cout << "При параметре m = 3 всего таких троек " << triangle(3, a1, a2, a3) << endl;
+   
+    cout << "Введите девять чисел: " << endl;
+    cin >> b1 >> b2 >> b3 >> b4 >> b5 >> b6 >> b7 >> b8 >> b9;
+    cout << "При параметре m = 9 всего таких троек " << triangle(9, b1, b2, b3, b4, b5, b6, b7, b8, b9) << endl;
+   
+    cout << "Введите одинадцать числа: " << endl;
+    cin >> c1 >> c2 >> c3 >> c4 >> c5 >> c6 >> c7 >> c8 >> c9 >> c10 >> c11;
+    cout << "При параметре m = 11 всего таких троек " << triangle(11, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11) << endl;
+    return 0;
+}
