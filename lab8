@@ -1,0 +1,85 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+struct gosudarstva
+{
+	string name;
+	string iaz;
+	string valute;
+	float kurs;
+	void enter_info(string n, string ia, string v, float k)
+	{
+		name = n;
+		iaz = ia;
+		valute = v;
+		kurs = k;
+	}
+};
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	system("chcp 1275");
+	system("cls");
+	int kol_gos;
+	gosudarstva mass[50];
+	cout << "Введите количество государств: ";
+	cin >> kol_gos;
+
+	for (int i = 0; i < kol_gos; i++)
+	{
+		string n, ia, v;
+		float k;
+		cout << "Введите название, язык, валюту, курс валюты относительно доллара государства №" << i + 1 << endl;
+		cin >> n >> ia >> v >> k;
+		mass[i].enter_info(n, ia, v, k);
+	}
+	
+	int zmass[50];
+	int k = 0;
+
+	string zname;
+	cout << "Введите название элемента, который надо удалить: ";
+	cin >> zname;
+	for (int i = 0; i < kol_gos; i++)
+	{
+		if (mass[i].name == zname)
+		{
+			zmass[k] = i;
+			k++;
+		}
+	}
+
+	string n1, ia1, v1;
+	float k1;
+	int d;
+	int b = kol_gos;
+	cout << "Введите количество государств, которые хотите добавить: ";
+	cin >> d;
+	for (int i = kol_gos; i < kol_gos + d; i++)
+	{
+		cout << "Введите название, язык, валюту, курс валюты относительно доллара нового государства: " << endl;
+		cin >> n1 >> ia1 >> v1 >> k1;
+		mass[b + 1].enter_info(n1, ia1, v1, k1);
+		b++;
+	}
+
+	ofstream f1("f1.txt");
+	for (int i = 0; i <= kol_gos + d; i++)
+	{
+		bool fl = true;
+		for (int j = 0; j < k; j++)
+		{
+			if (i == zmass[j])
+				fl = false;
+		}
+		if (fl == true)
+		{
+			f1 << mass[i].name << " " << mass[i].iaz << " " << mass[i].valute << " " << mass[i].kurs << endl;
+		}
+	}
+	f1.close();
+	return 0;
+}
