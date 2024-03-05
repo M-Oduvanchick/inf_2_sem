@@ -1,0 +1,179 @@
+#include <iostream>
+using namespace std;
+
+template <typename T>
+struct Node
+{
+	T data;
+	Node<T>* next;
+};
+template <typename T>
+struct List1
+{
+	int size;
+	Node<T>* head;
+	Node<T>* tail;
+};
+
+template <typename T>
+void init_list(List1<T>& l, const T& value)
+{
+	Node<T>* new_node = new Node<T>();
+	new_node->data = value;
+	l.head = new_node;
+	l.tail = new_node;
+	l.size = 1;
+}
+
+template <typename T>
+void push(List1<T>& l, const T& value)
+{
+	Node<T>* new_node = new Node<T>();
+	l.size++;
+	new_node->data = value;
+	new_node->next = nullptr;
+	l.tail->next = new_node;
+	l.tail = new_node;
+}
+
+template <typename T>
+void new_list(List1<T>& l, int n)
+{
+	T a;
+	cout << "Введите элемент: ";
+	cin >> a;
+	init_list(l, a);
+
+	for (int i = 2; i <= n; i++)
+	{
+		cout << "Введите элемент: ";
+		cin >> a;
+		push(l, a);
+	}
+}
+
+template <typename T>
+void print_list(List1<T>& l)
+{
+	Node<T>* tmp = l.head;
+	cout << "начало -> ";
+	while (tmp != nullptr)
+	{
+		cout << tmp->data << " -> ";
+		tmp = tmp->next;
+	}
+	cout << " конец." << endl;
+}
+
+template <typename T>
+void pop(List1<T>& l)
+{
+	Node<T>* tmp = l.head;
+	l.head = l.head->next;
+	l.size--;
+
+	delete tmp;
+}
+
+template <typename T>
+void delete_key(List1<T>& l, T k)
+{
+	int i = 1;
+	while (i <= l.size)
+	{
+		if (l.head->data == k)
+		{
+			pop(l);
+		}
+		else
+		{
+			push(l, l.head->data);
+			pop(l);
+			i++;
+		}
+	}
+}
+
+template <typename T>
+void insert(List1<T>& l, int count_begin, int count_end)
+{
+	int i = 1;
+	T a;
+	for (int j = 1; j <= count_begin; j++)
+	{
+		cout << "Введите элемент для добавления в начало: ";
+		cin >> a;
+		push(l, a);
+	}
+	for (i; i <= l.size - count_begin; i++)
+	{
+		push(l, l.head->data);
+		pop(l);
+	}
+	T b;
+	for (int j = 1; j <= count_end; j++)
+	{
+		cout << "Введите элемент для добавления в конец: ";
+		cin >> b;
+		push(l, b);
+	}
+}
+
+template <typename T>
+void delete_list(List1<T>& l)
+{
+	while (l.head->next != nullptr)
+	{
+		pop(l);
+	}
+	Node<T>* tmp = l.head;
+	l.head = nullptr;
+	l.size--;
+	delete tmp;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	List1<char> l;
+	int n;
+
+	do
+	{
+		cout << "Введите количество элементов в списке: ";
+		cin >> n;
+	} while (n <= 0);
+
+	new_list(l, n);
+	cout << endl;
+
+	print_list(l);
+
+	cout << endl << "Введите ключ для удаления элемента: ";
+	char key;
+	cin >> key;
+
+	delete_key(l, key);
+	cout << endl;
+	print_list(l);
+	cout << endl;
+
+	int begin;
+	int end;
+
+	cout << "Введите количество элементов, которые нужно добавить в начало: " << endl;
+	cin >> begin;
+
+	cout << "Введите количество элементов, которые нужно добавить в конец: " << endl;
+	cin >> end;
+
+	insert(l, begin, end);
+	cout << endl;
+	print_list(l);
+
+	cout << endl << "Сжигаем мосты!...." << endl;
+	delete_list(l);
+	print_list(l);
+
+	return 0;
+}
