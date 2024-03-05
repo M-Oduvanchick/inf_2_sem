@@ -1,0 +1,179 @@
+#include <iostream>
+using namespace std;
+
+template <typename T>
+struct Node
+{
+	T data;
+	Node<T>* next;
+};
+
+template <typename T>
+struct Queue
+{
+	int size;
+	Node<T>* head;
+	Node<T>* tail;
+};
+
+template <typename T>
+void init_queue(Queue<T>& q, const T& value)
+{
+	Node<T>* new_node = new Node<T>();
+	new_node->data = value;
+	q.head = new_node;
+	q.tail = new_node;
+	q.size = 1;
+}
+
+template <typename T>
+void push(Queue<T>& q, const T& value)
+{
+	Node<T>* new_node = new Node<T>();
+	q.size++;
+	new_node->data = value;
+	new_node->next = nullptr;
+	q.tail->next = new_node;
+	q.tail = new_node;
+}
+
+template <typename T>
+void new_queue(Queue<T>& q, int n)
+{
+	T a;
+	cout << "Введите элемент: ";
+	cin >> a;
+	init_queue(q, a);
+
+	for (int i = 2; i <= n; i++)
+	{
+		cout << "Введите элемент: ";
+		cin >> a;
+		push(q, a);
+	}
+}
+
+template <typename T>
+void print_queue(Queue<T>& q)
+{
+	Node<T>* tmp = q.head;
+	cout << "начало -> ";
+	while (tmp != nullptr)
+	{
+		cout << tmp->data << " -> ";
+		tmp = tmp->next;
+	}
+	cout << " конец." << endl;
+}
+
+template <typename T>
+void pop(Queue<T>& q)
+{
+	Node<T>* tmp = q.head;
+	q.head = q.head->next;
+	q.size--;
+	delete tmp;
+}
+
+template <typename T>
+void delete_key(Queue<T>& q, T k)
+{
+	int i = 1;
+	while (i <= q.size)
+	{
+		if (q.head->data == k)
+		{
+			pop(q);
+		}
+		else
+		{
+			push(q, q.head->data);
+			pop(q);
+			i++;
+		}
+	}
+}
+
+template <typename T>
+void insert(Queue<T>&q,int count_begin, int count_end)
+{
+	int i = 1;
+	T a;
+	for (int j = 1; j <= count_begin; j++)
+	{
+		cout << "Введите элемент для добавления в начало: ";
+		cin >> a;
+		push(q, a);
+	}
+	for (i; i <= q.size - count_begin; i++)
+	{
+		push(q, q.head->data);
+		pop(q);
+	}
+	T b;
+	for (int j = 1; j <= count_end; j++)
+	{
+		cout << "Введите элемент для добавления в конец: ";
+		cin >> b;
+		push(q, b);
+	}
+}
+
+template <typename T>
+void delete_queue(Queue<T>& q)
+{
+	while (q.head->next != nullptr)
+	{
+		pop(q);
+	}
+	Node<T>* tmp = q.head;
+	q.head = nullptr;
+	q.size--;
+	delete tmp;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	Queue<char> q;
+	int n;
+
+	do 
+	{
+		cout << "Введите количество элементов в очереди: ";
+		cin >> n;
+	} while (n <= 0);
+
+	new_queue(q, n);
+	cout << endl;
+
+	print_queue(q);
+
+	cout << endl << "Введите ключ для удаления элемента: ";
+	char key;
+	cin >> key;
+
+	delete_key(q, key);
+	cout << endl;
+	print_queue(q);
+	cout << endl;
+
+	int begin;
+	int end;
+
+	cout << "Введите количество элементов, которые нужно добавить в начало: " << endl;
+	cin >> begin;
+
+	cout << "Введите количество элементов, которые нужно добавить в конец: " << endl;
+	cin >> end;
+
+	insert(q, begin, end);
+	cout << endl;
+	print_queue(q);
+
+	cout << endl << "Сжигаем мосты!...." << endl;
+	delete_queue(q);
+	print_queue(q);
+
+	return 0;
+}
