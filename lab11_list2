@@ -1,0 +1,247 @@
+#include <iostream>
+using namespace std;
+
+int n;
+
+struct Node
+{
+	char data;
+	Node* next = nullptr;
+	Node* prev = nullptr;
+};
+
+struct List2
+{
+	int size;
+	Node* head = nullptr;
+	Node* tail = nullptr;
+	Node* cur = nullptr;
+};
+
+void create_list(List2& l, const char& value)
+{
+	l.size = 1;
+	Node* new_node = new Node();
+	new_node->data = value;
+	new_node->next = nullptr;
+	new_node->prev = nullptr;
+	l.head = new_node;
+	for (int i = 1; i < n; i++)
+	{
+		l.cur = new Node;
+		cout << "Введите  " << i + 1 << "  элемент: ";
+		cin >> l.cur->data;
+		l.cur->prev = new_node;
+		new_node->next = l.cur;
+		new_node = l.cur;
+		l.size++;
+	}
+	l.tail = new_node;
+	new_node->next = nullptr;
+}
+
+void push(List2& l, int index, const char& value)
+{
+	Node* new_node = new Node();
+	new_node->data = value;
+	l.size++;
+
+	if (l.head == nullptr)
+	{
+		l.head = new_node;
+		l.tail = new_node;
+		return;
+	}
+
+	if ((index == -1)||(index==0))
+	{
+		new_node->next = l.head;
+		l.head->prev = new_node;
+		l.head = new_node;
+		return;
+	}
+
+	Node* tmp;
+	int count = 0;
+	int from_t = l.size - 1 - index;
+
+	if (index < from_t)
+	{
+		tmp = l.head;
+
+		while (count != index)
+		{
+			tmp = tmp->next;
+			count++;
+		}
+	}
+
+	else
+	{
+		tmp = l.tail;
+
+		while (count != from_t)
+		{
+			tmp = tmp->prev;
+			count++;
+		}
+	}
+	new_node->next = tmp;
+	new_node->prev = tmp->prev;
+	tmp->prev = new_node;
+	tmp->next = new_node;
+	new_node->prev = new_node;
+}
+
+
+void print_list(List2& l)
+{
+	Node* tmp = l.head;
+	int coun = l.size;
+	while ((coun != 0) && (tmp != nullptr))
+	{
+		cout << tmp->data << " ";
+		tmp = tmp->next;
+		coun--;
+	}
+	cout << endl;
+}
+
+void pop(List2& l)
+{
+	if (l.head == nullptr)
+		return;
+	Node* tmp = l.head;
+	Node* prev = nullptr;
+	int count = 0;
+	while (tmp->next != nullptr) 
+	{
+		prev = tmp;
+		tmp = tmp->next;
+		count++;
+	}
+	Node* toDelete = tmp;
+	tmp = tmp->prev;
+	if (prev == nullptr) 
+	{
+		l.head = tmp;
+	}
+	else 
+	{
+		prev->next = tmp;
+	}
+	delete toDelete;
+	l.size--;
+}
+
+void delete_key(List2& l, char k)
+{
+	Node* del = l.head;
+	while ((del->data != k) && (del != nullptr))
+	{
+		del = del->next;
+	}
+
+	if ((l.head == del) && (l.tail == del))
+	{
+		l.head = nullptr;
+		l.tail = nullptr;
+	}
+	else
+	{
+		if (l.head == del)
+		{
+			l.head = del->next;
+			del->next->prev = nullptr;
+		}
+		else
+		{
+			if (l.tail == del)
+			{
+				l.tail = del->prev;
+				del->prev->next = nullptr;
+			}
+			else 
+			{
+				del->next->prev = del->prev;
+				del->prev->next = del->next;
+			}
+		}
+	}
+	delete del;
+	l.size--;
+}
+
+void delete_list(List2& l)
+{
+	Node* tmp = l.head;
+	int chet = l.size;
+	while (chet != 0)
+	{
+		tmp = l.head;
+		l.head = l.head->next;
+		delete tmp;
+		chet--;
+	}
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	List2 l;
+	
+	do
+	{
+		cout << "Введите количество элементов в списке: ";
+		cin >> n;
+	} while (n <= 0);
+
+	char first;
+	cout << "Введите первый элемент: ";
+	cin >> first;
+	create_list(l, first);
+	cout << endl;
+
+	print_list(l);
+
+	cout << endl << "Введите ключ для удаления элемента: ";
+	char key;
+	cin >> key;
+
+	delete_key(l, key);
+	cout << endl;
+	print_list(l);
+	cout << endl;
+
+	int begin;
+	int end;
+	char beg;
+	char en;
+
+	cout << "Введите количество элементов, которые нужно добавить в начало: " << endl;
+	cin >> begin;
+
+	cout << "Введите количество элементов, которые нужно добавить в конец: " << endl;
+	cin >> end;
+
+	for (int i = 0; i < begin; i++)
+	{
+		cout << "Введите элемент для добавления в начало: ";
+		cin >> beg;
+		push(l, 0, beg);
+	}
+	
+	for (int i = 0; i < end; i++)
+	{
+		cout << "Введите элемент для добавления в конец: ";
+		cin >> en;
+		push(l, n , en);
+	}
+	cout << endl;
+	print_list(l);
+
+	cout << endl << "Сжигаем мосты!...." << endl;
+	delete_list(l);
+
+	return 0;
+}
