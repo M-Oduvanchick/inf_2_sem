@@ -1,0 +1,173 @@
+#include <iostream>
+using namespace std;
+
+char a;
+
+struct Stek
+{
+	char data;
+	Stek* prev;
+};
+
+Stek* create(int n)
+{
+	if (n == 0)
+		return NULL;
+	Stek* s, * ss;
+	s = NULL;
+	ss = new Stek;
+	cin >> a;
+	ss->data = a;
+	ss->prev = NULL;
+	s = ss;
+	for (int i = 2; i <= n; i++)
+	{
+		Stek* sss = new Stek;
+		cin >> a;
+		sss->data = a;
+		sss->prev = s;
+		s = sss;
+	}
+	return s;
+}
+
+void print(Stek* s)
+{
+	if (s == NULL)
+	{
+		cout << "Стек пустой.";
+	}
+	else
+	{
+		Stek* ss = s;
+		while (ss != NULL)
+		{
+			cout << ss->data << " ";
+			ss = ss->prev;
+		}
+		cout << endl;
+	}
+}
+
+char pop(Stek*& s)
+{
+	Stek* ss = s;
+	int k = 0;
+	while (ss != 0)
+	{
+		k++;
+		ss = ss->prev;
+	}
+	ss = s;
+	if (k == 1)
+	{
+		char t = s->data;
+		delete ss;
+		s = NULL;
+		return t;
+	}
+	else
+	{
+		Stek* t = ss->prev;
+		char tt = ss->data;
+		s = t;
+		delete ss;
+		return tt;
+	}
+}
+
+Stek* push(Stek*& s, char value)
+{
+	Stek* ss = new Stek;
+	ss->data = value;
+	ss->prev = s;
+	s = ss;
+	return s;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	Stek* s;
+	int n;
+	do
+	{
+		cout << "Введите количество элементов в стеке: ";
+		cin >> n;
+	} while (n <= 0);
+
+	cout << "Введите элементы в стек: ";
+	Stek* st = create(n);
+
+	cout << endl;
+	print(st);
+
+	char key;
+	cout << "Введите элемент, который нужно удалить из стека: ";
+	cin >> key;
+	int k;
+	k = 0;
+	Stek* st2 = create(0);
+
+	for (int i = 0; i < n; i++)
+	{
+		char t = pop(st);
+		if (t != key)
+		{
+			push(st2, t);
+		}
+		else
+		{
+			k++;
+		}
+	}
+	n = n - k;
+
+	for (int i = 0; i < n; i++)
+	{
+		char t = pop(st2);
+		push(st, t);
+	}
+	cout << endl;
+	print(st);
+
+	k = 0;
+	int begin = 0;
+	int end = 0;
+
+	cout << "Введите количество элементов, которые добавить в начало: ";
+	cin >> begin;
+
+	cout << "Введите количество элементов, которые добавить в конец: ";
+	cin >> end;
+
+	for (int i = 0; i < n; i++)
+	{
+		char ss = pop(st);
+		push(st2, ss);
+	}
+
+	for (int i = 0; i < begin; i++)
+	{
+		cout << "Введите элемент, который нужно добавить в начало: ";
+		cin >> a;
+		push(st, a);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		char ss = pop(st2);
+		push(st, ss);
+	}
+
+	for (int i = 0; i < end; i++)
+	{
+		cout << "Введите элемент, который нужно добавить в конец: ";
+		cin >> a;
+		push(st, a);
+	}
+
+	cout << endl;
+	print(st);
+	return 0;
+}
