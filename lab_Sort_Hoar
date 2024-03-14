@@ -1,0 +1,53 @@
+#include<iostream>
+using namespace std;
+
+void SortHoar(int* A, int l, int r)
+{
+	int i, j, tmp, opora;
+	i = l;
+	j = r;
+	opora = A[(l + r) / 2];
+	do
+	{
+		while ((A[i] < opora) && (i < r))
+			i++;
+		while ((opora < A[j]) && (j > l))
+			j--;
+		if (i <= j)
+		{
+			tmp = A[i];
+			A[i] = A[j];
+			A[j] = tmp;
+			i++;
+			j--;
+		}
+	} while (i <= j);
+	if (l < j)
+		SortHoar(A, l, j);
+	if (i < r)
+		SortHoar(A, i, r);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	int i;
+	int mas[20] = { 7, 3, 11, 5, 2, 18, 5, 9, 20, 1, 19, 21, 12, 17, 15, 0, 14, 8, 16 };
+
+	cout << "Изначальный массив: ";
+	for (int i = 0; i < 20; i++)
+	{
+		cout << mas[i] << " ";
+	}
+	cout << endl;
+	int n = 20;
+	SortHoar(mas, 0, n - 1);
+	cout << endl;
+	cout << "Упорядоченный массив: ";
+	for (i = 0; i < 20; i++)
+	{
+		cout << mas[i] << " ";
+	}
+	cout << endl;
+	return 0;
+}
