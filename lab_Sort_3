@@ -1,0 +1,62 @@
+#include<iostream>
+using namespace std;
+int n;
+
+void CountingSort(int* mas)
+{
+	int min = mas[0];
+	int max = mas[0];
+	int p = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (mas[i] < min)
+			min = mas[i];
+		if (mas[i] > max)
+			max = mas[i];
+	}
+
+	int* c = new int[n];
+
+	for (int i = 0; i < n; i++)
+	{
+		c[i] = 0;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		c[mas[i]-min]++;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		if (c[i] > 0)
+		{
+			for (int j = 0; j < c[i]; j++)
+			{
+				mas[p] = i + min;
+				p++;
+			}
+		}
+	}
+	delete c;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	int i, n = 0;
+	int* A = new int[100];
+	cout << "Размер массива: ";
+	cin >> n;
+	for (i = 0; i < n; i++)
+	{
+		cout << i + 1 << " элемент: ";
+		cin >> A[i];
+	}
+	CountingSort(A);
+	cout << "Упорядоченный массив: ";
+	for (i = 0; i < n; i++)
+	{
+		cout << A[i] << " ";
+	}
+	return 0;
+}
