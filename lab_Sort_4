@@ -1,0 +1,82 @@
+#include<iostream>
+using namespace std;
+int n;
+
+void BucketSort(int* mas, int n)
+{
+	int min = mas[0];
+	int max = mas[0];
+
+	for (int i = 0; i < n; i++)
+	{
+		if (mas[i] < min)
+			min = mas[i];
+		if (mas[i] > max)
+			max = mas[i];
+	}
+
+	int count = max - min + 1;
+	int** c = new int*[count];
+
+	for (int i = 0; i < count; i++)
+	{
+		c[i] = new int[n];
+	}
+	for (int i = 0; i < n; i++)
+	{
+		int index = (mas[i] - min) / count;
+		c[index][i] = mas[i];
+	}
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			for (int k = j; k < n; k++)
+			{
+				if (c[i][j] > c[i][k])
+				{
+					int tmp = c[i][j];
+					c[i][j] = c[i][k];
+					c[i][k] = tmp;
+				}
+			}
+		}
+	}
+	int index = 0;
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (c[i][j] != 0)
+			{
+				mas[index++] = c[i][j];
+			}
+		}
+	}
+	for (int i = 0; i < count; i++)
+	{
+		delete[] c[i];
+	}
+	delete[] c;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	int n;
+	int* A = new int[100];
+	cout << "Размер массива: ";
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		cout << i + 1 << " элемент: ";
+		cin >> A[i];
+	}
+	BucketSort(A, n);
+	cout << "Упорядоченный массив: ";
+	for (int i = 0; i < n; i++)
+	{
+		cout << A[i] << " ";
+	}
+	return 0;
+}
