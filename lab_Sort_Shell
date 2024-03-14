@@ -1,0 +1,43 @@
+#include<iostream>
+using namespace std;
+
+void SortShell(int* mas, int size)
+{
+	int tmp;
+	for (int step = size / 2; step > 0; step --)
+	{
+		for (int i = step; i < size; i++)
+		{
+			int j = i;
+			while ((j >= step) && (mas[j - step] > mas[i]))
+			{
+				tmp = mas[j];
+				mas[j] = mas[j - step];
+				mas[j - step] = tmp;
+				j = j - step;
+			}
+		}
+	}
+}
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	int i;
+	int mas[20] = { 7, 3, 11, 5, 2, 18, 5, 9, 20, 1, 19, 21, 12, 17, 15, 0, 14, 8, 16 };
+	
+	cout << "Изначальный массив: ";
+	for (int i = 0; i < 20; i++)
+	{
+		cout << mas[i] << " ";
+	}
+	cout << endl;
+	SortShell(mas, 20);
+	cout << endl;
+	cout << "Упорядоченный массив: ";
+	for (i = 0; i < 20; i++)
+	{
+		cout << mas[i] << " ";
+	}
+	cout << endl;
+	return 0;
+}
