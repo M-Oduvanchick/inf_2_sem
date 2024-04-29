@@ -1,0 +1,119 @@
+#include <iostream>
+using namespace std;
+
+void Natural_Merg_Sort(int* mas, int larg, int index)
+{
+	int first = 1;
+	int second = 1;
+	int i = 0;
+	bool flag = false;
+
+	while ((mas[i] <= mas[i + 1]) && (i < larg - 1))
+	{
+		first++;
+		i++;
+	}
+
+	if ((mas[i] > mas[i + 1]) && (i < larg - 1))
+	{
+		i++;
+		flag = true;
+
+		while ((mas[i] <= mas[i + 1]) && (i < larg - 1))
+		{
+			second++;
+			i++;
+		}
+	}
+	int all = i + 1;
+	int* mas1 = new int[first];
+	int* mas2 = new int[second];
+
+	for (int j = 0; j < first; j++)
+	{
+		mas1[j] = mas[j];
+	}
+	int chet = 0;
+	if (flag == true)
+	{
+		for (int j = first; j < all; j++)
+		{
+			mas2[chet] = mas[j];
+			chet++;
+		}
+	}
+
+	int s = 0;
+	int f = 0;
+
+	if (flag == true)
+	{
+		for (i = 0; i < all; i++)
+		{
+			if (((mas1[f] < mas2[s]) || (s >= second)) && (f < first))
+			{
+				mas[i] = mas1[f];
+				f++;
+			}
+			else
+			{
+				if (((mas1[f] > mas2[s]) || (f >= first)) && (s < second))
+				{
+					mas[i] = mas2[s];
+					s++;
+				}
+				else
+				{
+					if ((mas1[f] == mas2[s]) && (s < second) && (f < first))
+					{
+						mas[i] = mas1[f];
+						mas[i + 1] = mas2[s];
+						f++;
+						s++;
+						i++;
+					}
+				}
+			}
+		}
+	}
+
+	delete[] mas1;
+	delete[] mas2;
+}
+
+void Merg_Sort(int* mas, int larg, int index)
+{
+	if (index < larg)
+	{
+		Natural_Merg_Sort(mas, larg, index);
+		Merg_Sort(mas, larg, index + 1);
+	}
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+
+	int n;
+	int* mas = new int[100];
+	cout << "Введите длину массива: ";
+	cin >> n;
+
+	cout << "Введите элементы массива: ";
+	for (int i = 0; i < n; i++)
+	{
+		cin >> mas[i];
+	}
+	cout << endl;
+
+	Merg_Sort(mas, n, 0);
+
+	cout << "Упорядоченный массив: ";
+	for (int i = 0; i < n; i++)
+	{
+		cout << mas[i] << " ";
+	}
+	cout << endl;
+	delete[] mas;
+	return 0;
+}
