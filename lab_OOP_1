@@ -1,0 +1,57 @@
+#include <iostream>
+using namespace std;
+
+class prog
+{
+private:
+	double first, second;
+	double pow(double x, double y)
+	{
+		cout << "Вызов метода pow(" << x << ", " << y << ")" << endl;
+		double result = 1;
+		for (int i = 1; i <= y; i++)
+		{
+			result *= x;
+		}
+		return result;
+	}
+public:
+	prog(double, double);
+	double element(int);
+	void setFirst(double);
+	void setSecond(double);
+};
+prog::prog(double first = 1, double second = 1)
+{
+	cout << "Вызов конструктора класса prog(" << first << " , " << second << ")" << endl;
+	this->first = first;
+	this->second = second;
+};
+
+double prog::element(int j)
+{
+	cout << "Вызов метода element(" << j << ")" << endl;
+	return first * pow(second, j);
+}
+
+void prog::setFirst(double a0)
+{
+	cout << "Privot поле first(a0) = " << a0 << endl;
+	this->first = a0;
+}
+
+void prog::setSecond(double r)
+{
+	cout << "Privot поле second(r) = " << r << endl;
+	this->second = r;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	prog prog(1, 10);
+	prog.setFirst(3);
+	prog.setSecond(2);
+	cout << "Значение функции = " << prog.element(3) << endl;
+	return 0;
+}
