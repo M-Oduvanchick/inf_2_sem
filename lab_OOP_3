@@ -1,0 +1,193 @@
+#include <iostream>
+using namespace std;
+#pragma once
+
+class PairNumbers
+{
+	int firstN;
+	double secondN;
+
+public:
+	PairNumbers();
+	PairNumbers(int, double);
+	PairNumbers(const PairNumbers&);
+	double diff();
+	void add(int);
+	void add(double);
+	void getInfo();
+	~PairNumbers();
+	void setFirstN(int);
+	void setSecondN(double);
+	void operator= (const PairNumbers&);
+	void operator+ (int);
+	void operator+ (double);
+	void operator- (const PairNumbers&);
+	int returnFirstN();
+	double returnSecondN();
+
+private:
+	int OneN;
+	double TwoN;//для запоминания первоначальных значений
+};
+
+PairNumbers::PairNumbers() // конструктор по умолчанию
+{
+	cout << "Вызов конструктора по умолчанию   " << this << endl;
+	firstN = 0;
+	secondN = 0;
+	this->OneN = 0;
+	this->TwoN = 0;
+}
+
+PairNumbers::PairNumbers(int first, double second)//конструктор с параметрами
+{
+	cout << "Вызов конструктора с параметрами    " << this << endl;
+	this->firstN = first;
+	this->secondN = second;
+	this->OneN = first;
+	this->TwoN = second;
+}
+
+PairNumbers::PairNumbers(const PairNumbers& a) //конструктор копирования
+{
+	cout << "Вызов конструктора копирования    " << this << endl;
+	this->firstN = a.OneN;
+	this->secondN = a.TwoN;
+}
+
+double PairNumbers::diff()//вычитание первоначальных чисел
+{
+	return this->firstN - this->secondN;
+}
+
+void PairNumbers::add(int number)//прибавление числа к целому числу
+{
+	this->firstN += number;
+}
+
+void PairNumbers::add(double number)//прибавление числа к вещественному числу
+{
+	this->secondN += number;
+}
+
+void PairNumbers::getInfo()//вывод на экран через :
+{
+	cout << this->firstN << " : " << this->secondN << endl;
+}
+
+PairNumbers:: ~PairNumbers()//Вызов деструктора
+{
+	cout << "Вызов деструктора    " << this << endl;
+}
+
+void PairNumbers::setFirstN(int a) //инициализация первого числа
+{
+	this->firstN = a;
+	this->OneN = a;
+}
+
+void PairNumbers::setSecondN(double a)//инициализация второго числа
+{
+	this->secondN = a;
+	this->TwoN = a;
+}
+
+void PairNumbers:: operator=  (const PairNumbers& a)//перегрузка опреатора =
+{
+	cout << "Вызов оператора = " << endl;
+	this->firstN = a.OneN;
+	this->secondN = a.TwoN;
+}
+
+void PairNumbers:: operator+ (int r)//перегрузка оператора +
+{
+	cout << "Вызов оператора + " << endl;
+	firstN += r;
+}
+
+void PairNumbers:: operator+ (double r)//перегрузка опрератора +
+{
+	cout << "Вызов оператора + " << endl;
+	secondN += r;
+}
+
+void PairNumbers:: operator- (const PairNumbers& a)//перегрузка опрератора -
+{
+	firstN -= a.firstN;
+	secondN -= a.secondN;
+}
+
+int PairNumbers::returnFirstN()//возвращение значения первого числа
+{
+	return firstN;
+}
+
+double PairNumbers::returnSecondN()//возвращение значения второго числа
+{
+	return secondN;
+}
+
+ostream& operator<< (ostream& os, PairNumbers& b)//перегрузка оператора вывода
+{
+	cout << "Вызов перегрузки оператора вывода " << endl;
+	os << b.returnFirstN() << " : " << b.returnSecondN();
+	return os;
+}
+istream& operator>> (istream& in, PairNumbers& c)//перегрузка оператора ввода
+{
+	cout << "Вызов перегрузки оператора ввода " << endl;
+	int first;
+	double second;
+	/*c.setFirstN(first);
+	c.setSecondN(second);*/
+	in >> first >> second;
+	c.setFirstN(first);
+	c.setSecondN(second);
+	return in;
+}
+
+ostream& operator<< (ostream& os, PairNumbers& b);
+istream& operator>> (istream& in, PairNumbers& c);
+
+int main()
+{
+	system("chcp 1251>Null");
+	PairNumbers ex(7, 10);
+	ex.getInfo();
+	cout << endl;
+
+	cout << "Разность чисел равна  " << ex.diff() << endl;
+
+	ex.add(23);
+	ex.getInfo();
+	cout << endl;
+
+	ex.add(4.37);
+	ex.getInfo();
+	cout << endl;
+
+	PairNumbers ex2;
+	ex2.getInfo();
+	cout << endl;
+
+	PairNumbers ex3(ex);
+	ex3.getInfo();
+	cout << endl;
+
+	PairNumbers ex4;
+	ex4 = ex;
+	ex4.getInfo();
+	cout << endl;
+
+	cin >> ex;
+	cout << ex << endl;
+
+	ex2 - ex;
+	cout << ex2 << endl;
+
+	ex + 35;
+	ex + 6.32;
+	cout << ex << endl;
+
+	return 0;
+}
