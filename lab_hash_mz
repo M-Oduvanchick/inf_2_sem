@@ -1,0 +1,293 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <math.h>
+using namespace std;
+
+const int M = 95;
+const double A = M_PI_4;
+int collisionCounter = 0;
+
+struct Node
+{
+	string key = "";
+	string value = "";
+	Node* next = nullptr;
+	Node* prev = nullptr;
+};
+
+struct HashTable
+{
+	Node* table[M];
+	HashTable()
+	{
+		for (int i = 0; i < M; i++)
+		{
+			table[i] = nullptr;
+		}
+	}
+};
+
+double mod1(double k)
+{
+	int intPart = static_cast<int>(k);
+	return k - intPart;
+}
+
+int getHash(double k)
+{
+	return static_cast<int>(M * mod1(k * A));
+}
+
+int getHash(string line)
+{
+	int n = 0;
+	for (int i = 0; i < line.size(); i++)
+	{
+		n += static_cast<int>(pow(line[i], 2) * M_2_SQRTPI + abs(line[i]) * M_SQRT1_2);
+	}
+	return getHash(abs(n));
+}
+
+bool add(HashTable& table, string key, string elem)
+{
+	Node* newNode = new Node;
+	newNode->key = key;
+	newNode->value = elem;
+	newNode->next = nullptr;
+	newNode->prev = nullptr;
+	int hash = getHash(key);
+	if (table.table[hash] == nullptr)
+	{
+		table.table[hash] = newNode;
+		return true;
+	}
+	else
+	{
+		Node* current = table.table[hash];
+		while (current->next != nullptr)
+		{
+			current = current->next;
+		}
+		current->next = newNode;
+		newNode->prev = current;
+		collisionCounter++;
+		return true;
+	}
+}
+
+bool removeByKey(HashTable& table, string key)
+{
+	int hash = getHash(key);
+	Node* current = table.table[hash];
+	while (current != nullptr)
+	{
+		if (current->key == key)
+		{
+			if (current->prev != nullptr)
+			{
+				current->prev->next = current->next;
+			}
+			else
+			{
+				table.table[hash] = current->next;
+			}
+			if (current->next != nullptr)
+			{
+				current->next->prev = current->prev;
+			}
+			delete current;
+			return true;
+		}
+		current = current->next;
+	}
+	return false;
+}
+
+bool removeByValue(HashTable& table, string elem)
+{
+	for (int i = 0; i < M; i++)
+	{
+		Node* current = table.table[i];
+		while (current != nullptr)
+		{
+			if (current->value == elem)
+			{
+				if (current->prev != nullptr)
+				{
+					current->prev->next = current->next;
+				}
+				else
+				{
+					table.table[i] = current->next;
+				}
+				if (current->next != nullptr)
+				{
+					current->next->prev = current->prev;
+				}
+				delete current;
+				return true;
+			}
+			current = current->next;
+		}
+	}
+	return false;
+}
+
+Node* get(HashTable& table, string key)
+{
+	int hash = getHash(key);
+	Node* current = table.table[hash];
+	while (current != nullptr)
+	{
+		if (current->key == key)
+		{
+			return current;
+		}
+		current = current->next;
+	}
+	return nullptr;
+}
+
+void print(HashTable& table)
+{
+	for (int i = 0; i < M; i++)
+	{
+		Node* current = table.table[i];
+		while (current != nullptr)
+		{
+			cout << "-" << current->key << ": " << current->value << ")\n";
+			current = current->next;
+		}
+	}
+	cout << endl;
+}
+
+string surnames[] = {
+	"Агапьев", "Агашин", "Бабаджанов", "Бакластый", "Вакуленко",
+	"Галкин", "Данилин", "Евдохин", "Железный", "Заевский", 
+	"Иванцов", "Калабашкин", "Лавриков", "Магомедов", "Налимов", 
+	"Овтухов", "Палашин", "Рагозинский", "Сабуров", "Тарабыкин", 
+	"Удобин", "Фастов", "Харламов", "Цибуля", "Чайкин", 
+	"Шальнов", "Щуров", "Эвентов", "Юркин", "Ярунов"
+};
+
+string names[] = {
+	"Адам", "Альберт", "Анатолий", "Борис", "Вадим",
+	"Владислав", "Геннадий", "Герман", "Дмитрий", "Денис",
+	"Евгений", "Егор", "Елисей", "Зиновий", "Игнат",
+	"Инокентий", "Кай", "Клим", "Лев", "Макар",
+	"Матвей", "Николай", "Олег", "Павел", "Роберт",
+	"Ростислав", "Семен", "Тарас", "Федор", "Филипп"
+};
+
+string patronymics[] = {
+	"Яковлевич", "Юрьевич", "Эдуардович", "Федорович", "Тарасович",
+	"Семеночич", "Сергеевич", "Степанович", "Ренатович", "Робертович",
+	"петрович", "Павлович", "Олегович", "Николаевич", "Никитич",
+	"Маркович", "Максимович", "Михайлович", "Львович", "Леонидович",
+	"Каевич", "Кириллович", "Константинович", "Иванович", "Игоревич",
+	"Егорович", "Елисеевич", "Денисович", "Дмитриевич", "Георгевич"
+};
+
+string generateFullName()
+{
+	return surnames[rand() % 30] + ' ' + names[rand() % 30] + ' ' + patronymics[rand() % 30];
+}
+
+string correctStr(int n, int length)
+{
+	string strn = to_string(n);
+	while (strn.size() < length)
+	{
+		strn = '0' + strn;
+	}
+	while (strn.size() < length)
+	{
+		strn.erase(0, 1);
+	}
+	return strn;
+}
+
+string generateBirthday()
+{
+	return correctStr(rand() % 28 + 1, 2) + '.' + correctStr(rand() % 12 + 1, 2) + '.' + to_string(rand() % 74 + 1950);
+}
+
+string generatePassportNum()
+{
+	return correctStr(rand() % 10000, 4) + ' ' + correctStr((rand() % 1000000 * 100 + rand()), 6);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	srand(time(NULL));
+	HashTable myTable;
+	for (int i = 0; i < M; i++)
+	{
+		string birthday = generateBirthday();
+		string newHuman = generateFullName() + " | " + birthday + " | " + generatePassportNum();
+		add(myTable, birthday, newHuman);
+	}
+	cout << "Создана хэш-таблица: " << endl;
+	print(myTable);
+
+	int existingInd = rand() % M;
+	while (myTable.table[existingInd] == nullptr)
+	{
+		existingInd = rand() % M;
+	}
+	Node* randomhuman = myTable.table[existingInd];
+	string keyToRemove = randomhuman->key;
+	cout << "Удаление по ключу-> " << keyToRemove << ": " << endl;
+	if (removeByKey(myTable, keyToRemove))
+	{
+		cout << "Элемент с ключом-> " << keyToRemove << " успешно удален." << endl;
+	}
+	else
+	{
+		cout << "Элемент с ключом-> " << keyToRemove << " не найден." << endl;
+	}
+	print(myTable);
+
+	existingInd = rand() % M;
+	while (myTable.table[existingInd] == nullptr)
+	{
+		existingInd = rand() % M;
+	}
+	randomhuman = myTable.table[existingInd];
+	string valueToRemove = randomhuman->value;
+	cout << "Удаление по значению->" << valueToRemove << ": " << endl;
+	if (removeByValue(myTable, valueToRemove))
+	{
+		cout << "Элемент со значением-> " << valueToRemove << " успешно удален." << endl;
+	}
+	else
+	{
+		cout << "Элемент со значением-> " << valueToRemove << " не найден." << endl;
+	}
+	print(myTable);
+
+	existingInd = rand() % M;
+	while (myTable.table[existingInd] == nullptr)
+	{
+		existingInd = rand() % M;
+	}
+	randomhuman = myTable.table[existingInd];
+	string keyToGet = randomhuman->key;
+	cout << "Получение элемента по ключу->" << keyToGet << ": " << endl;
+	Node* node = get(myTable, keyToGet);
+	if (node != nullptr)
+	{
+		cout << "Найден элемент: " << node->value << endl;
+	}
+	else
+	{
+		cout << "Элемент с ключом-> " << keyToGet << " не найден." << endl;
+	}
+	cout << "Число коллизий: " << collisionCounter << endl;
+	return 0;
+}
