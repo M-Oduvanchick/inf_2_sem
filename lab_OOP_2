@@ -1,0 +1,111 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Money
+{
+	string name;
+	double salary;
+	int bonus;
+public:
+	Money();
+	Money(string, double, int);
+	Money(const Money&);
+	~Money();
+	string getName();
+	void setName(string);
+	double getSalary();
+	void setSalary(double);
+	int getBonus();
+	void setBonus(int);
+	void Print();
+};
+
+Money::Money()
+{
+	name = "noname";
+	salary = 0;
+	bonus = 0;
+	cout << endl << "Конструктор по умолчанию для объекта " << this << endl;
+}
+Money::Money(string name = "noname", double salary = 0, int bonus = 0)
+{
+	this->name = name;
+	this->salary = salary;
+	this->bonus = bonus;
+	cout << endl << "Конструктор с параметрами для объекта " << this << endl;
+}
+Money::Money(const Money& other)
+{
+	this->name = other.name;
+	this->salary = other.salary;
+	this->bonus = other.bonus;
+	cout << endl << "Конструктор копирования для объекта" << this << endl;
+}
+Money::~Money()
+{
+	cout << endl << "Деструктор для объекта " << this << endl;
+}
+string Money::getName()
+{
+	return this->name;
+}
+void Money::setName(string name)
+{
+	this->name = name;
+}
+double Money::getSalary()
+{
+	return this->salary;
+}
+void Money::setSalary(double salary)
+{
+	this->salary = salary;
+}
+int Money::getBonus()
+{
+	return this->bonus;
+}
+void Money::setBonus(int bonus)
+{
+	this->bonus = bonus;
+}
+
+void Money::Print()
+{
+	cout << endl << "ФИО: " << this->name << endl << "Окдад: " << this->salary << endl << "Премия: " << this->bonus << endl;
+}
+
+Money make_money()
+{
+	string name;
+	double salary;
+	int bonus;
+	cout << "Введите имя: ";
+	getline(cin, name);
+	cout << "Введите размер оклада: ";
+	cin >> salary;
+	cout << "Введите премию в % от оклада: ";
+	cin >> bonus;
+	Money money(name, salary, bonus);
+	return money;
+}
+
+int main()
+{
+	system("chcp 1251>NULL");
+	setlocale(LC_ALL, "RU");
+	Money m1;
+	m1.Print();
+	Money m2("Иванов Иван Иванович", pow(3, 30) - 1, 0);
+	m2.Print();
+	Money m3;
+	m3.setName("Доктор Кто");
+	m3.setSalary(6600);
+	m3.setBonus(100);
+	cout << "ФИО: " << m3.getName() << " Оклад: " << m3.getSalary() << " Премия: " << m3.getBonus() << endl;
+	Money m4 = make_money();
+	m4.Print();
+	return 0;
+}
