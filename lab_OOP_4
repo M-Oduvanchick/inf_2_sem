@@ -1,0 +1,129 @@
+#include <iostream>
+#pragma once
+#include <string.h>
+using namespace std;
+class Persona
+{
+protected:
+	string name;
+	int age;
+};
+
+class student :Persona
+{
+	string predmet;
+	int mark;
+public:
+	student() //конструктор по умолчанию
+	{
+		cout << "Вызов конструктора по умолчанию    " << this << endl;
+		this->name = "неизвестно";
+		this->age = 0;
+		this->predmet = "неизвестно";
+		this->mark = 0;
+	}
+	student(string name, int age, string predmet, int mark) //конструктор с параметрами
+	{
+		cout << "Вызов конструктора с параметрами    " << this << endl;
+		this->name = name;
+		this->age = age;
+		this->predmet = predmet;
+		this->mark = mark;
+	}
+	student(const student& a) //конструктор копирования
+	{
+		cout << "Вызов конструктора копирования    " << this << endl;
+		this->name = a.name;
+		this->age = a.age;
+		this->predmet = a.predmet;
+		this->mark = a.mark;
+	}
+	~student() {//деструктор
+		cout << "Вызов деструктора    " << this << endl;
+	}
+	void getInfo() //вывод на экран
+	{
+		cout << "Имя студента: " << name << endl;
+		cout << "Возраст: " << age << " лет" << endl;
+		cout << "Предмет: " << predmet << endl;
+		cout << "Оценка: " << mark << endl;
+		if (mark < 3)
+		{
+			cout << "Неудовлетворительная оценка" << endl;
+		}
+	}
+	void setName(string& a)
+	{
+		this->name = a;
+	}
+	void setAge(int& a)
+	{
+		this->age = a;
+	}
+	void setPredmet(string& a)
+	{
+		this->predmet = a;
+	}
+	void setMark(int& a)
+	{
+		this->mark = a;
+	}
+	student& operator = (const student& a) //перегрузка оператора =
+	{
+		cout << "Перегрузка оператора =   " << endl;
+		this->name = a.name;
+		this->age = a.age;
+		this->predmet = a.predmet;
+		this->mark = a.mark;
+		return *this;
+	}
+	friend ostream& operator << (ostream&, const student&);//перегрузка оператора вывода
+	friend istream& operator >> (istream& is, student& a);//перегрузка оператора ввода
+};
+ostream& operator << (ostream& os, const student& a)
+{
+	os << a.name << endl;
+	os << a.age << endl;
+	os << a.predmet << endl;
+	os << a.mark << endl;
+	if (a.mark < 3)
+		os << "Неудовлетворительная оценка!" << endl;
+	return os;
+}
+istream& operator >> (istream& is, student& a)
+{
+	cout << "Введите имя студента: ";
+	is >> a.name;
+	cout << endl << "Введите возраст: ";
+	is >> a.age;
+	cout << endl << "Введите предмет: ";
+	is >> a.predmet;
+	cout << endl << "Введите оценку: ";
+	is >> a.mark;
+	return is;
+}
+
+int main()
+{
+	system("chcp 1251>Null");
+	student Ex1; //работа конструктора по умолчанию
+	Ex1.getInfo();
+	cout << endl;
+
+	student Ex2("Кукушенко_Коля ", 17, "Математика", 2);//работа конструктора с параметрами
+	Ex2.getInfo();
+	cout << endl;
+
+	student Ex3("Чудиков_Максим", 19, "Химия", 5);//конструктор с параметрами
+	Ex3.getInfo();
+	cout << endl;
+
+	student Ex4(Ex1);//конструктор копирования
+	cout << Ex4 << endl;
+	cin >> Ex4; //ввод с клавиатуры
+	cout << endl;
+	student Ex5;
+	Ex5 = Ex4; //перегрузка опреатора=
+	cout << Ex5 << endl;
+	return 0;
+}
