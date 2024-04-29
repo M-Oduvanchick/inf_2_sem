@@ -1,0 +1,203 @@
+#include <iostream>
+#pragma once
+#include <string>
+using namespace std;
+
+
+class Obgect
+{
+public:
+	Obgect() {};
+	virtual ~Obgect() {};
+	virtual void output() = 0;
+};
+
+
+class Person : public Obgect
+{
+	friend istream& operator >> (istream& in, Person& p)
+	{
+		cout << "Введите имя: ";
+		in >> p.name;
+		cout << "Введите возраст: ";
+		in >> p.age;
+		cout << endl;
+		return in;
+	}
+	friend ostream& operator << (ostream& out, const Person& p)
+	{
+		out << "Имя: " << p.name << endl;
+		out << "Возраст: " << p.age << endl;
+		return out;
+	}
+protected:
+	string name;
+	int age;
+public:
+	~Person() {	}
+	Person()
+	{
+		name = "неизвестно";
+		age = 0;
+	}
+	Person(int Age, string Name)
+	{
+		name = Name;
+		age = Age;
+	}
+	Person(const Person& p)
+	{
+		name = p.name;
+		age = p.age;
+	}
+	string getName() {
+		return name;
+	}
+	int getAge() {
+		return age;
+	}
+	void setName(string Name)
+	{
+		name = Name;
+	}
+	void setAge(int Age)
+	{
+		age = Age;
+	}
+	Person& operator = (const Person& p)
+	{
+		age = p.age;
+		name = p.name;
+		return *this;
+	}
+	void output() override {
+		cout << "Имя: " << name << endl;
+		cout << "Возраст: " << age << endl;
+	}
+};
+
+
+class Student : public Person
+{
+	friend istream& operator >> (istream& is, Student& s)
+	{
+		cout << "Введите имя: ";
+		is >> s.name;
+		cout << "Введите возраст: ";
+		is >> s.age;
+		cout << "Введите оценку: ";
+		is >> s.mark;
+		cout << endl;
+		return is;
+	}
+	friend ostream& operator << (ostream& on, const Student& s)
+	{
+		on << "Имя: " << s.name << endl;
+		on << "Возраст: " << s.age << endl;
+		if (s.mark <= 5 || s.mark >= 1)
+		{
+			on << "Оценка: " << s.mark << endl;
+			if (s.mark > 5 || s.mark < 1)
+			{
+				on << "Несуществующую оценка" << endl;
+			}
+			if (s.mark == 5) {
+				on << "Отлично!" << endl;
+			}
+			if (s.mark == 4) {
+				on << "Хорошо!" << endl;
+			}
+			if (s.mark < 4 && s.mark > 0) {
+				on << "Неудовлетворительная оценка" << endl;
+			}
+		}
+		return on;
+	}
+protected:
+	int mark;
+public:
+	~Student() {}
+	Student()
+	{
+		mark = 0;
+	}
+	Student(const Student& s)
+	{
+		mark = s.mark;
+	}
+	Student(const string& name, const int& age, const int& mark) :Person(age, name)
+	{
+		this->setMark(mark);
+	}
+	Student(const int& age, const string& name, const int& mark) :Student(name, age, mark) {}
+	void setMark(const int& mark) {
+		if (mark <= 0 || mark >= 6)
+		{
+			cout << "Неверно введена оценка" << endl;
+		}
+	}
+	int getMark() const {
+		return this->mark;
+	}
+};
+
+class BEKTOP {
+private:
+	Obgect** beg;
+	int size;
+	int current;
+public:
+	friend ostream& operator <<(ostream& out, const BEKTOP& v)
+	{
+		if (v.size == 0)
+		{
+			cout << "Вектор пустой" << endl;
+		}
+		else
+		{
+			Obgect** ptr = v.beg;
+			for (int i = 0; i < v.current; i++)
+			{
+				(*ptr)->output();
+				ptr++;
+			}
+		}
+		return out;
+	}
+	BEKTOP() {
+		beg = 0;
+		size = 0;
+		current = 0;
+	};
+	BEKTOP(int lin)
+	{
+		beg = new Obgect * [lin];
+		current = 0;
+		size = lin;
+	}
+	~BEKTOP() {}
+	void Add(Obgect* ptr)
+	{
+		if (current < size)
+		{
+			beg[current] = ptr;
+			current++;
+		}
+	}
+};
+
+
+int main()
+{
+	system("chcp 1251>Null");
+	BEKTOP vector(5);
+	Person person;
+	Student student;
+	cin >> person;
+	cout << person;
+	cin >> student;
+	cout << student;
+	Obgect* p = &person;
+	vector.Add(p);
+	cout << vector;
+}
