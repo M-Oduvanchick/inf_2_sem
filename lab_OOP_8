@@ -1,0 +1,403 @@
+Vector.h
+#pragma once
+#include "Object.h"
+
+class Vector
+{
+public:
+	Vector();
+	Vector(int);//конструктор с параметрами
+
+	void Add();//добавление элеменнта в вектор
+	void Del();//удаление элемента из вектора, память не освобождается
+	void Show();
+	void Get_Name();
+	int operator()();//размер вектора
+
+	~Vector();//деструктор
+	void HandlEvent(const TEvent& e);
+
+protected:
+	Object** beg;//указатель на первый элемент вектора
+	int size;//размер
+	int cur;//текущий элемент
+};
+Vector.cpp
+#include "Vector.h"
+#include "Print.h"
+#include "Magazin.h"
+#include <iostream>
+using namespace std;
+
+Vector::Vector()
+{
+	beg = 0;
+	cur = 0;
+	size = 0;
+}
+Vector::~Vector()
+{
+	if (beg != 0)
+		delete[] beg;
+	beg = 0;
+}
+
+Vector::Vector(int n)
+{
+	beg = new Object * [n];
+	cur = 0;
+	size = n;
+}
+
+void Vector::Add()
+{
+	Object* p;
+	cout << "1. Издательство" << endl << "2. Журнал" << endl;
+	int x;
+	cin >> x;
+	if (x == 1)
+	{
+		Print* a = new Print;
+		a->Input();
+		p = a;
+		if (cur < size)
+		{
+			beg[cur] = p;
+			cur++;
+		}
+	}
+	else
+		if (x == 2)
+		{
+			Magazin* b = new Magazin;
+			b->Input();
+			p = b;
+			if (cur < size)
+			{
+				beg[cur] = p;
+				cur++;
+			}
+		}
+}
+
+void Vector::Get_Name()
+{
+	Object** p = beg;
+	for (int i = 0; i < cur; i++)
+	{
+		(*p)->Get_Name();
+		p++;
+	}
+}
+
+void Vector::Show()
+{
+	if (cur == 0)
+	{
+		cout << "Пусто." << endl;
+	}
+	Object** p = beg;
+	for (int i = 0; i < cur; i++)
+	{
+		(*p)->Show();
+		p++;
+	}
+}
+int Vector::operator()()
+{
+	return cur;
+}
+
+void Vector::Del()
+{
+	if (cur == 0)
+		return;
+	cur--;
+}
+
+void Vector::HandlEvent(const TEvent& e)
+{
+	if (e.what == evMessage)
+	{
+		Object** p = beg;
+		for (int i = 0; i < cur; i++)
+		{
+			(*p)->HandlEvent(e);
+			p++;
+		}
+	}
+}
+Print.h
+#pragma once
+#include <string>
+#include "Object.h"
+
+using namespace std;
+
+class Print :
+	public Object
+{
+public:
+	Print();//конструктор без параметров
+public:
+	void Show();//функция для просмотра атрибутов класса с помощью указателя
+	void Input();//функция для вводв значений атрибутов
+	void Get_Name();
+	Print(string, string);//конструктор с параметрами
+	Print(const Print&);//конструктор копирования
+	//селекторы
+	string Get_name() { return name; }
+	string Get_author() { return author; }
+	//модификаторы
+	void Set_name(string);
+	void Set_author(string);
+	Print& operator=(const Print&);//перегрузка операции присваивания
+
+	~Print();//деструктор
+	void HandlEvent(const TEvent& e);
+
+protected:
+	string name;
+	string author;
+};
+Print.cpp
+#include "Print.h"
+#include <iostream>
+using namespace std;
+
+Print::Print()
+{
+	name = "";
+	author = "";
+}
+
+Print::~Print()
+{
+}
+
+Print::Print(string N, string A)
+{
+	name = N;
+	author = A;
+}
+
+Print::Print(const Print& print)
+{
+	name = print.name;
+	author = print.author;
+}
+
+void Print::Set_name(string N)
+{
+	name = N;
+}
+
+void Print::Set_author(string A)
+{
+	author = A;
+}
+
+Print& Print::operator=(const Print& P)
+{
+	if (&P == this)
+		return *this;
+	name = P.name;
+	author = P.author;
+	return *this;
+}
+
+void Print::Show()
+{
+	cout << "\nНазвание: " << name;
+	cout << "\nАвтор: " << author << endl;
+}
+
+void Print::Input()
+{
+	cout << "\nВведите название: ";
+	cin >> name;
+	cout << "\nВведите автора: ";
+	cin >> author;
+	cout << endl;
+}
+
+void Print::Get_Name()
+{
+	cout << name << endl;
+}
+
+void Print::HandlEvent(const TEvent& e)
+{
+	if (e.what == evMessage)
+	{
+		switch (e.command)
+		{
+		case cmGet:cout << "Название: " << Get_name() << endl; break;
+		}
+
+	}
+}
+Object.h
+#pragma once
+#include <string>
+#include "Event.h"
+using namespace std;
+
+class Object
+{
+public:
+	Object();
+	virtual void Show() = 0;
+	virtual void Input() = 0;
+	virtual string Get_name() = 0;
+	virtual void Get_Name() = 0;
+	virtual void HandlEvent(const TEvent& e) = 0;
+	~Object();
+};
+Object.cpp
+#include "Object.h"
+
+Object::Object(void)
+{
+}
+
+Object::~Object(void)
+{
+}
+Magazin.h
+#pragma once
+#include <string>
+#include "Print.h"
+
+using namespace std;
+
+class Magazin :
+	public Print
+{
+public:
+	Magazin();
+public:
+	Magazin(string, string, int);
+	Magazin(const Magazin&);
+
+	void Show();
+	void Input();
+	void Get_Name();
+	string Get_name() { return name; }
+
+	int Get_pages() { return pages; }
+	void Set_pages(int);
+
+	Magazin& operator=(const Magazin&);
+	~Magazin();
+protected:
+	int pages;
+};
+Magazin.cpp
+#include "Magazin.h"
+#include <iostream>
+using namespace std;
+
+Magazin::Magazin() : Print()
+{
+	pages = 0;
+}
+
+Magazin::~Magazin()
+{
+}
+
+Magazin::Magazin(string N, string A, int P) : Print(N, A)
+{
+	pages = P;
+}
+
+Magazin::Magazin(const Magazin& m)
+{
+	name = m.name;
+	author = m.author;
+	pages = m.pages;
+}
+
+void Magazin::Set_pages(int p)
+{
+	pages = p;
+}
+
+Magazin& Magazin::operator=(const Magazin& m)
+{
+	if (&m == this)
+		return *this;
+	name = m.name;
+	author = m.author;
+	pages = m.pages;
+	return *this;
+}
+
+void Magazin::Show()
+{
+	cout << "\nНазвание: " << name;
+	cout << "\nАвтор: " << author;
+	cout << "\nСтраницы: " << pages << endl;
+}
+
+void Magazin::Input()
+{
+	cout << "\nВведите название:";
+	cin >> name;
+	cout << "\nВведите автора: ";
+	cin >> author;
+	cout << "\nВведите количество страниц: ";
+	cin >> pages;
+	cout << endl;
+}
+
+void Magazin::Get_Name()
+{
+	cout << name << endl;
+}
+Event.h
+#pragma once
+
+const int evNothing = 0;
+const int evMessage = 100;
+const int cmAdd = 1;
+const int cmDel = 2;
+const int cmGet = 3;
+const int cmShow = 4;
+const int cmMake = 6;
+const int cmQuit = 101;
+
+struct TEvent
+{
+	int what;
+	union
+	{
+		int command;
+		struct
+		{
+			int message;
+			int a;
+		};
+	};
+};
+Dialog.h
+#pragma once
+#include "Vector.h"
+#include "Event.h"
+
+class Dialog :
+	public Vector
+{
+public:
+	Dialog();
+	void GetEvent(TEvent& event);
+	void Execute();
+	void HandleEvent(TEvent& event);
+	void ClearEvent(TEvent& event);
+	bool Valid();
+	void EndExec();
+	~Dialog();
+protected:
+	int EndState;
+};
