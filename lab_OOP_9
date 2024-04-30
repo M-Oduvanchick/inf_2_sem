@@ -1,0 +1,283 @@
+Error.h
+#pragma once
+#include<string>
+#include<iostream>
+using namespace std;
+
+class Error
+{
+private:
+	string code[4] = { "Ошибка!! Нельзя сместиться, выход за пределы списка!", "Ошибка!! Невозможно получить первый элемент пустого списка!", "Ошибка!! Невозможно получить последний элемент пустого списка!", "Ошибка!! Индекс вышел за пределы диапазона!" };
+	string str;
+public:
+	Error(int i)
+	{
+		str = code[i];
+	}
+	void What()
+	{
+		cout << str << endl;
+	}
+};
+List.h
+#pragma once
+#include <string>
+#include <iostream>
+#include "Error.h"
+using namespace std;
+
+struct Node
+{
+	int key;
+	Node* next;
+};
+
+class Iterator
+{
+private:
+	Node* current;
+	friend class List;
+public:
+	Iterator()
+	{
+		current = NULL;
+	}
+	Iterator(Node* node)
+	{
+		current = node;
+	}
+	void operator ++()
+	{
+		if (current == NULL)
+		{
+			throw Error(0);
+		}
+		current = current->next;
+	}
+	Node* operator *() const
+	{
+		return current;
+	}
+	void operator +(int shift)
+	{
+		Node* tmp = current;
+		int i = 0;
+		while (i < shift && current != NULL && current->next != NULL)
+		{
+			current = current->next;
+			i++;
+		}
+		if (i < shift)
+		{
+			current = tmp;
+			throw Error(0);
+		}
+	}
+};
+
+class List
+{
+public:
+	List() {};
+	List(int);
+	~List();
+	List& operator=(List&);
+	int& operator[](int);
+	int operator()();
+	friend ostream& operator<<(ostream&, List&);
+	friend istream& operator>>(istream&, List&);
+	Iterator first();
+	Iterator last();
+	void operator<<(int);
+private:
+	Node* lastNode, * current, * head;
+	int n = 0;
+	Iterator beg, end;
+};
+List.cpp
+#include "List.h"
+
+List::List(int count)
+{
+	n = count;
+	head = new Node;
+	head->key = 0;
+	lastNode = head;
+	for (int i = 1; i < n; i++)
+	{
+		current = new Node;
+		current->key = 0;
+		lastNode->next = current;
+		lastNode = current;
+	}
+	lastNode->next = NULL;
+}
+
+List::~List()
+{
+	lastNode = head;
+	while (lastNode != NULL)
+	{
+		current = lastNode->next;
+		delete lastNode;
+		lastNode = current;
+	}
+	n = 0;
+}
+
+List& List::operator=(List& l)
+{
+	if (this != &l)
+	{
+		if (this != 0)
+		{
+			lastNode = head;
+			while (lastNode != NULL)
+			{
+				current = lastNode->next;
+				delete lastNode;
+				lastNode = current;
+			}
+			n = 0;
+		}
+		lastNode = head = new Node;
+		l.lastNode = l.head->next;
+		lastNode->key = l.head->key;
+		while (l.lastNode != NULL)
+		{
+			lastNode->next = new Node;
+			lastNode->next->key = l.lastNode->key;
+			l.lastNode = l.lastNode->next;
+			lastNode = lastNode->next;
+		}
+		lastNode->next = NULL;
+		n = l.n;
+	}
+	return *this;
+}
+
+int& List::operator[](int index)
+{
+	if (index >= n)
+	{
+		throw Error(3);
+	}
+	lastNode = head;
+	for (int i = 0; i < index; i++)
+	{
+		lastNode = lastNode->next;
+	}
+	return lastNode->key;
+}
+
+int List::operator()()
+{
+	return n;
+}
+
+Iterator List::first()
+{
+	if (!n)
+	{
+		throw Error(1);
+	}
+	beg.current = head;
+	return beg;
+}
+
+Iterator List::last()
+{
+	if (!n)
+	{
+		throw Error(2);
+	}
+	lastNode = head;
+	while (lastNode->next != NULL)
+	{
+		lastNode = lastNode->next;
+	}
+	end.current = lastNode;
+	return end;
+}
+
+ostream& operator<<(ostream& out, List& l)
+{
+	if (l.n)
+	{
+		l.lastNode = l.head;
+		while (l.lastNode != NULL)
+		{
+			out << l.lastNode->key << ' ';
+			l.lastNode = l.lastNode->next;
+		}
+	}
+	else
+	{
+		out << "Список пуст(";
+	}
+	return out;
+}
+
+istream& operator>>(istream& in, List& l)
+{
+	l.lastNode = l.head;
+	while (l.lastNode != NULL)
+	{
+		in >> l.lastNode->key;
+		l.lastNode = l.lastNode->next;
+	}
+	return in;
+}
+
+void List::operator<<(int number)
+{
+	if (head == NULL)
+	{
+		head = new Node;
+		head->key = number;
+		head->next = NULL;
+	}
+	else
+	{
+		lastNode = head;
+		while (lastNode->next != NULL)
+		{
+			lastNode = lastNode->next;
+		}
+		lastNode->next = new Node;
+		lastNode->next->key = number;
+		lastNode = lastNode->next;
+		lastNode->next = NULL;
+	}
+	n += 1;
+}
+Main.cpp
+#include <iostream>
+#include "List.h"
+#include "Error.h"
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL,"RU");
+	system("chcp1251>NULL");
+	try
+	{
+		List a(2);
+		List b;
+		cout << a << endl;
+		cout << b << endl;
+		cout << b[0];
+		Iterator i = b.first();
+		Iterator j = b.last();
+		Iterator k = a.last();
+		++k;
+		++k;
+		k + 1;
+	}
+	catch (Error& m_Error)
+	{
+		m_Error.What();
+	}
+	return 0;
+}
