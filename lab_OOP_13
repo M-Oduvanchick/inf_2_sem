@@ -1,0 +1,440 @@
+Pair.h
+#pragma once
+#include <iostream>
+using namespace std;
+
+class Pair
+{
+	int first;
+	double second;
+public:
+	friend istream& operator>>(istream& in, Pair& p);
+	friend ostream& operator<<(ostream& out, const Pair& p);
+	Pair(int, double);
+	Pair();
+	Pair(const Pair&);
+	~Pair();
+	Pair& operator=(const Pair&);
+	Pair operator-(const Pair&);
+	Pair& operator+(int);
+	Pair& operator+(double);
+	Pair& operator++();
+	Pair operator++(int);
+	int GetFirst()const;
+	double GetSecond()const;
+	friend bool operator<(const Pair&, const Pair&);
+	Pair& operator+(const Pair& m_pair);
+	void SetFirst(int m_first);
+	void SetSecond(double m_second);
+};
+Pair.cpp
+#include "Pair.h"
+
+Pair::Pair(int first, double second)
+{
+	this->first = first;
+	this->second = second;
+}
+
+istream& operator>>(istream& in, Pair& m_pair)
+{
+	in >> m_pair.first;
+	in >> m_pair.second;
+	return in;
+}
+
+ostream& operator<<(ostream& out, const Pair& m_pair)
+{
+	return(out << m_pair.first << ":" << m_pair.second);
+}
+
+Pair::Pair()
+{
+	first = 0;
+	second = 0;
+}
+
+Pair::~Pair()
+{
+}
+
+Pair::Pair(const Pair& m_pair)
+{
+	first = m_pair.first;
+	second = m_pair.second;
+}
+
+Pair& Pair::operator=(const Pair& m_pair)
+{
+	if (&m_pair != this)
+	{
+		first = m_pair.first;
+		second = m_pair.second;
+	}
+	return *this;
+}
+
+Pair Pair::operator-(const Pair& m_pair)
+{
+	Pair result(first - m_pair.first, second - m_pair.second);
+	return result;
+}
+
+Pair& Pair::operator+(int first)
+{
+	this->first += first;
+	return *this;
+}
+
+Pair& Pair::operator+(double second)
+{
+	this->second += second;
+	return *this;
+}
+
+Pair& Pair::operator++()
+{
+	++first;
+	++second;
+	return *this;
+}
+
+Pair Pair::operator++(int)
+{
+	Pair temp = *this;
+	this->first++;
+	this->second++;
+	return temp;
+}
+
+int Pair::GetFirst() const
+{
+	return first;
+}
+
+double Pair::GetSecond() const
+{
+	return second;
+}
+
+bool operator<(const Pair& pair1, const Pair& pair2)
+{
+	return(pair1.GetFirst() + pair1.GetSecond() < pair2.GetFirst() + pair2.GetSecond());
+}
+
+Pair& Pair::operator+(const Pair& m_pair)
+{
+	first += m_pair.first;
+	second += m_pair.second;
+	return *this;
+}
+
+void Pair::SetFirst(int m_first)
+{
+	first = m_first;
+}
+
+void Pair::SetSecond(double m_second)
+{
+	second = m_second;
+}
+Задача 1:
+Main1.cpp
+#include "Pair.h"
+#include <iostream>
+#include <list>
+#include <numeric>
+#include <algorithm>
+using namespace std;
+
+void PushArithmeticMiddle(list<Pair>& m_list)
+{
+	if (m_list.size() > 0)
+	{
+		Pair Middle = accumulate(m_list.begin(), m_list.end(), Pair(0, 0));
+		Middle.SetFirst(Middle.GetFirst() / m_list.size());
+		Middle.SetSecond(Middle.GetSecond() / m_list.size());
+		m_list.push_back(Middle);
+	}
+	else
+	{
+		cout << "Список пуст(" << endl;
+	}
+}
+
+void EraselflnRange(list<Pair>& m_list, const double BeginValue, const double EndValue)
+{
+	auto i= remove_if(m_list.begin(), m_list.end(), [BeginValue, EndValue](Pair p) 
+	{
+	return ((BeginValue <= p.GetFirst() && p.GetFirst() <= EndValue) || (BeginValue <= p.GetSecond() && p.GetSecond() <= EndValue));		
+	});
+	m_list.erase(i, m_list.end());
+}
+
+void PlusMinAndMax(list<Pair>& m_list)
+{
+	if (m_list.size() > 0)
+	{
+		Pair max = *max_element(m_list.begin(), m_list.end());
+		Pair min = *min_element(m_list.begin(), m_list.end());
+		for (Pair& c : m_list)
+		{
+			c + max + min;
+		}
+	}
+}
+
+void ShowList(const list<Pair>& m_list)
+{
+	if (m_list.size() > 0)
+	{
+		for_each(m_list.begin(), m_list.end(), [](Pair p)
+			{
+				cout << p << endl;
+			});
+	}
+	else
+	{
+		cout << "Список пуст(";
+	}
+	cout << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	system("chcp1251>NULL");
+	list<Pair>a = { Pair(5,3),Pair(1,4),Pair(2,7.5) };
+	cout << "Список а: " << endl;
+	ShowList(a);
+	cout << "Добавляем среднее арифметическое списка а в конец контейнера:" << endl;
+	PushArithmeticMiddle(a);
+	cout << "Список а: " << endl;
+	ShowList(a);
+	cout << "Удаляем из списка а элементы, значения которых входят в диапазон от 2 до 3:" << endl;
+	EraselflnRange(a, 2, 3);
+	cout << "Список а: " << endl;
+	ShowList(a);
+	cout << "К каждому элементу добавляем сумму минимального и максимального элементов контейнера:" << endl;
+	PlusMinAndMax(a);
+	cout << "Список а: " << endl;
+	ShowList(a);
+	return 0;
+}
+Задача 2:
+Main2.cpp
+#include "Pair.h"
+#include <iostream>
+#include <list>
+#include <queue>
+#include <numeric>
+#include <algorithm>
+using namespace std;
+
+list<Pair>priority_queueTolist(priority_queue<Pair>& m_priority_queue)
+{
+	priority_queue<Pair>tmp_priority_queue = m_priority_queue;
+	list<Pair>m_list;
+	while (tmp_priority_queue.size() > 0)
+	{
+		m_list.push_back(tmp_priority_queue.top());
+		tmp_priority_queue.pop();
+	}
+	return m_list;
+}
+
+void PushArithmeticMiddle(priority_queue<Pair>& m_priority_queue)
+{
+	if (m_priority_queue.size() > 0)
+	{
+		list<Pair>m_list = priority_queueTolist(m_priority_queue);
+		Pair Middle = accumulate(m_list.begin(), m_list.end(), Pair(0, 0));
+		Middle.SetFirst(Middle.GetFirst() / m_list.size());
+		Middle.SetSecond(Middle.GetSecond() / m_list.size());
+		m_priority_queue.push(Middle);
+	}
+	else
+	{
+		cout << "Очередь пуста(" << endl;
+	}
+}
+
+void EraselflnRange(priority_queue<Pair>& m_priority_queue, const double BeginValue, const double EndValue)
+{
+	if (m_priority_queue.size() > 0)
+	{
+		list<Pair>m_list = priority_queueTolist(m_priority_queue);
+		auto i = remove_if(m_list.begin(), m_list.end(), [BeginValue, EndValue](Pair p) 
+			{
+			return (BeginValue <= p.GetFirst() && p.GetFirst() <= EndValue) || (BeginValue <= p.GetSecond() && p.GetSecond() <= EndValue);
+			});
+		m_priority_queue = {};
+		if (i != m_list.begin())
+		{
+			for_each(m_list.begin(), i--, [&m_priority_queue](Pair p)
+				{
+					m_priority_queue.push(p);
+				});
+		}
+	}
+}
+
+void PlusMinAndMax(priority_queue<Pair>& m_priority_queue)
+{
+	if (m_priority_queue.size() > 0)
+	{
+		list<Pair>m_list = priority_queueTolist(m_priority_queue);
+		m_priority_queue = {};
+		Pair max = *max_element(m_list.begin(), m_list.end());
+		Pair min = *min_element(m_list.begin(), m_list.end());
+		for (Pair& c : m_list)
+		{
+			m_priority_queue.push(c + max + min);
+		}
+	}
+}
+
+void Show_priority_queue(priority_queue<Pair>& m_priority_queue)
+{
+	if (m_priority_queue.size() > 0)
+	{
+		list<Pair>m_list = priority_queueTolist(m_priority_queue);
+		for_each(m_list.begin(), m_list.end(), [](Pair p)
+			{
+				cout << p << endl;
+			});
+	}
+	else
+	{
+		cout << "Очередь пуста(" << endl;
+	}
+	cout << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	system("chcp1251>NULL");
+	priority_queue<Pair>a;
+	for (Pair i : {Pair(5, 3), Pair(1, 4), Pair(2, 7.5)})
+	{
+		a.push(i);
+	}
+	cout << "Очередь с приоритетами: " << endl;
+	Show_priority_queue(a);
+	cout << "Добавляем среднее арифметическое очереди а в контейнер: " << endl;
+	PushArithmeticMiddle(a);
+	cout << "Очередь а: " << endl;
+	Show_priority_queue(a);
+	cout << "Удаляем из очереди а элементыб значения которых входят в диапазон от 2 до 3: " << endl;
+	EraselflnRange(a, 2, 3);
+	cout << "Очередь а: " << endl;
+	Show_priority_queue(a);
+	cout << "К каждому элементу добавляем сумму минимального и максимального элементов контейнера: " << endl;
+	PlusMinAndMax(a);
+	cout << "Очередь а: " << endl;
+	Show_priority_queue(a);
+	return 0;
+}
+Задача 3:
+Main3.cpp
+#include "Pair.h"
+#include <iostream>
+#include <list>
+#include <map>
+#include <numeric>
+#include <algorithm>
+using namespace std;
+
+void PushArithmeticMiddle(map<int, int>& m_map)
+{
+	if (m_map.size() > 0)
+	{
+		int MaxKey = max_element(m_map.begin(), m_map.end(), [](const auto& p1, const auto& p2)
+			{
+				return p1.first < p2.first;
+			})->first + 1;
+		int MiddleSecond = accumulate(m_map.begin(), m_map.end(), 0, [](int value, const auto& p)
+			{
+				return value + p.second;
+			}) / m_map.size();
+			m_map[MaxKey] = MiddleSecond;
+			m_map.insert({ MaxKey,MiddleSecond });
+	}
+	else
+	{
+		cout << "Словарь пуст(" << endl;
+	}
+}
+
+void EraselflnRange(map<int, int>& m_map, const int BeginValue, const int EndValue)
+{
+	for (auto p = m_map.begin(); p != m_map.end();)
+	{
+		if (BeginValue <= (*p).second && (*p).second <= EndValue)
+		{
+			p = m_map.erase(p);
+		}
+		else
+		{
+			p++;
+		}
+	};
+}
+
+void PlusMinAndMax(map<int, int>& m_map)
+{
+	if (m_map.size() > 0)
+	{
+		int MaxValue = max_element(m_map.begin(), m_map.end(), [](const auto& p1, const auto& p2)
+			{
+				return p1.second < p2.second;
+			})->second;
+		int MinValue = min_element(m_map.begin(), m_map.end(), [](const auto& p1, const auto& p2)
+			{
+				return p1.second < p2.second;
+			})->second;
+		for (auto& p : m_map)
+		{
+			p.second += MaxValue + MinValue;
+		}
+	}
+}
+
+void ShowMap(const map<int, int>& m_map)
+{
+	if (m_map.size() > 0)
+	{
+		for (auto& p : m_map)
+		{
+			cout << p.first << ":" << p.second << endl;
+		}
+	}
+	else
+	{
+		cout << "Словарь пуст(" << endl;
+	}
+	cout << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	system("chcp1251>NULL");
+	map<int, int>a = { {5, 3},{1, 4},{2, 7.5} };
+	cout << "Словарь а:"<<endl;
+	ShowMap(a);
+	cout << "Добавляем среднее арифметическое словаря а в конец контейнера:" << endl;
+	PushArithmeticMiddle(a);
+	cout << "Словарь а:" << endl;
+	ShowMap(a);
+	cout << "Удаляем из словаря а элементы, значения которых входят в диапазон от 2 до 3:" << endl;
+	EraselflnRange(a, 2, 3);
+	cout << "Словарь а:" << endl;
+	ShowMap(a);
+	cout << "К каждому элементу добавляем сумму минималььного и максимального элементов контейнеров:" << endl;
+	PlusMinAndMax(a);
+	cout << "Словарь а:" << endl;
+	ShowMap(a);
+	return 0;
+}
