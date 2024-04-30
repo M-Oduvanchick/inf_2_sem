@@ -1,0 +1,298 @@
+Pair.h
+#pragma once
+#include <iostream>
+using namespace std;
+
+class Pair
+{
+	int first;
+	double second;
+public:
+	Pair();
+	Pair(int, double);
+	Pair(const Pair&);
+	~Pair();
+	Pair& operator=(const Pair&);
+	Pair operator-(const Pair&);
+	Pair operator++(int);
+	Pair& operator+(int);
+	Pair& operator+(double);
+	Pair& operator++();
+	friend istream& operator>>(istream& in, Pair& p);
+	friend ostream& operator<<(ostream& out, const Pair& p);
+	int GetFirst()const;
+	double GetSecond()const;
+	void SetFirst(int m_first);
+	void SetSecond(double m_second);
+};
+
+Pair.cpp
+#include "Pair.h"
+
+Pair::Pair(int first, double second)
+{
+	this->first = first;
+	this->second = second;
+}
+
+istream& operator>>(istream& in, Pair& m_pair)
+{
+	in >> m_pair.first;
+	in >> m_pair.second;
+	return in;
+}
+
+ostream& operator<<(ostream& out, const Pair& m_pair)
+{
+	return (out << m_pair.first << ":" << m_pair.second);
+}
+
+Pair::Pair()
+{
+	first = 0;
+	second = 0;
+}
+
+Pair::~Pair()
+{
+}
+
+Pair::Pair(const Pair& m_pair)
+{
+	first = m_pair.first;
+	second = m_pair.second;
+}
+
+Pair& Pair::operator=(const Pair& m_pair)
+{
+	if (&m_pair != this)
+	{
+		first = m_pair.first;
+		second = m_pair.second;
+	}
+	return *this;
+}
+
+Pair Pair::operator-(const Pair& m_pair)
+{
+	Pair result(first - m_pair.first, second - m_pair.second);
+	return result;
+}
+
+Pair& Pair::operator+(int first)
+{
+	this->first += first;
+	return *this;
+}
+
+Pair& Pair::operator+(double second)
+{
+	this->second += second;
+	return *this;
+}
+
+Pair& Pair::operator++()
+{
+	++first;
+	++second;
+	return *this;
+}
+
+Pair Pair::operator++(int)
+{
+	Pair temp = *this;
+	this->first++;
+	this->second++;
+	return temp;
+}
+
+int Pair::GetFirst()const
+{
+	return first;
+}
+
+double Pair::GetSecond()const
+{
+	return second;
+}
+
+void Pair::SetFirst(int m_first)
+{
+	first = m_first;
+}
+
+void Pair::SetSecond(double m_second)
+{
+	second = m_second;
+}
+
+List.h
+#pragma once
+#include <string>
+#include <iostream>
+using namespace std;
+
+template<class T>
+struct Node
+{
+	T key;
+	Node<T>* next;
+};
+
+template<class T>
+class List
+{
+public:
+	List() {};
+	List(int count)
+	{
+		n = count;
+		head = new Node<T>;
+		head->key = 0;
+		lastNode = head;
+		for (int i = 1; i < n; i++)
+		{
+			current = new Node<T>;
+			current->key = 0;
+			lastNode->next = current;
+			lastNode = current;
+		}
+		lastNode->next = NULL;
+	};
+	~List()
+	{
+		lastNode = head;
+		while (lastNode != NULL)
+		{
+			current = lastNode->next;
+			delete lastNode;
+			lastNode = current;
+		}
+		n = 0;
+	};
+	List& operator=(List<T>& l)
+	{
+		if (this != &l)
+		{
+			if (this != 0)
+			{
+				lastNode = head;
+				while (lastNode != NULL)
+				{
+					current = lastNode->next;
+					delete lastNode;
+					lastNode = current;
+				}
+				n = 0;
+			}
+			lastNode = head = new Node<T>;
+			l.lastNode = l.head->next;
+			lastNode->key = l.head->key;
+			while (l.lastNode != NULL)
+			{
+				lastNode->next = new Node<T>;
+				lastNode->next->key = l.lastNode->key;
+				l.lastNode = l.lastNode->next;
+				lastNode = lastNode->next;
+			}
+			lastNode->next = NULL;
+			n = l.n;
+		}
+		return *this;
+	};
+	int& operator[](int index)
+	{
+		if (index < n)
+		{
+			lastNode = head;
+			for (int i = 0; i < index; i++)
+			{
+				lastNode = lastNode->next;
+			}
+			return lastNode->key;
+		}
+		else
+		{
+			cout << "Ошибка!!Значение индекса вышло за предел допустимых значений(";
+		}
+	};
+	int operator()()
+	{
+		return n;
+	};
+	friend ostream& operator<<(ostream& out, List<T>& l)
+	{
+		if (l.n)
+		{
+			l.lastNode = l.head;
+			while (l.lastNode != NULL)
+			{
+				out << l.lastNode->key << ' ';
+				l.lastNode = l.lastNode->next;
+			}
+		}
+		else
+		{
+			out << "Список пуст!!";
+		}
+		return out;
+	};
+	friend istream& operator>>(istream& in, List<T>& l)
+	{
+		l.lastNode = l.head;
+		while (l.lastNode != NULL)
+		{
+			in >> l.lastNode->key;
+			l.lastNode = l.lastNode->next;
+		}
+		return in;
+	};
+	void operator <<(T t)
+	{
+		if (head == NULL)
+		{
+			head = new Node<T>;
+			head->key = t;
+			head->next = NULL;
+		}
+		else
+		{
+			lastNode = head;
+			while (lastNode->next != NULL)
+			{
+				lastNode = lastNode->next;
+			}
+			lastNode->next = new Node<T>;
+			lastNode->next->key = t;
+			lastNode = lastNode->next;
+			lastNode->next = NULL;
+		}
+		n += 1;
+	};
+private:
+	Node<T>* lastNode, * current, * head;
+	int n = 0;
+};
+
+Main.cpp
+#include <iostream>
+#include"List.h"
+#include"Pair.h"
+using namespace std;
+
+int main()
+{
+	List<int> l;
+	l << 5;
+	l << 3;
+	cout << "List<int>: " << endl;
+	cout << l << endl;
+	List<Pair> p;
+	Pair c;
+	c.SetFirst(9);
+	c.SetSecond(9.7);
+	p << c;
+	cout << "List<Pair>: " << endl;
+	cout << p << endl;
+	return 0;
+}
