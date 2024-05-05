@@ -1,0 +1,469 @@
+#include <glut.h>
+#include<stdio.h>
+#define _USE_MATH_DEFINES
+#include <Windows.h>
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <list>
+#include <fstream>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+template <typename T>
+class Tree {
+private:
+	Tree<T>* left;
+	Tree<T>* right;
+	Tree<T>* parent;
+	T data;
+public:
+	GLfloat x = 0, y = 3;
+	int state, level = 1;
+	Tree<T>() {//Конструктор без значений
+		left = right = parent = nullptr;
+	}
+	Tree<T>(T data) {//Конструктор со значением 
+		this->data = data;
+		left = right = parent = nullptr;
+	}
+	~Tree<T>() {//Деструктор
+		delete_right();
+		delete_left();
+		delete_tree();
+	}
+	void insert(T data) {//Вставляет новый узел со значением data в нужное место в дереве
+		Tree<T>* current = this;
+		while (current != nullptr) {
+			if (data > current->data) {
+				if (current->right != nullptr) {
+					current = current->right;
+				}
+				else {
+					current->insert.right(data);
+					return;
+				}
+			}
+			else if (data < current->data) {
+				if (current->left != nullptr) {
+					current = current->left;
+				}
+				else {
+					current->insert.left(data);
+					return;
+				}
+			}
+			else return;
+		}
+	}
+	void insert_right(T data) {//Вставляет новый узел со значением data в правое поддерево
+		Tree<T>* new_node = new Tree(data);
+		if (this->right != nullptr) {
+			this->right->parent = new_node;
+			new_node->right = this->right;
+		}
+		this->right = new_node;
+		new_node->parent = this;
+	}
+	void insert_left(T data) {//Вставляет новый узел со значением data в левое поддерево
+		left = new Tree<T>(data);
+		left->parent = this;
+	}
+	void delete_tree() {//Удаляет полностью дерево
+		delete this;
+	}
+	T get_data() {//Возвращает значение в data
+		return this->data;
+	}
+	Tree<T>* get_right() {//Возвращает указатель на правое поддерево
+		return this->right;
+	}
+	Tree<T>* get_left() {//Возвращает указатель на левое поддерево
+		return this->left;
+	}
+	Tree<T>* get_parent() {//Возвращает указатель на родительский узел
+		return this->parent;
+	}
+	void erase(T data) {//Функция, которая удаляет узел с заданным значением
+		Tree<T>* to_erase = this->find(data);
+		Tree<T>* to_parent = to_erase->parent;
+		if (to_erase->left == nullptr && to_erase->right == nullptr) {
+			if (to_parent->left == nullptr) {
+				to_parent->left == nullptr;
+				delete to_erase;
+			}
+			else {
+				to_parent->right == nullptr;
+				delete to_erase;
+			}
+		}
+		else if ((to_erase->left != nullptr && to_erase->right != nullptr) || ((to_erase->left == nullptr && to_erase->right != nullptr))) {
+			if (to_erase->left == nullptr) {
+				if (to_erase == to_parent->left) {
+					to_parent->left = to_erase->right;
+				}
+				else {
+					to_parent->righjt == to_erase->right;
+				}
+				to_erase->right->parent = to_parent;
+			}
+			else {
+				if (to_parent->left == to_erase) {
+					to_parent->left = to_erase->left;
+				}
+				else {
+					to_parent->right = to_erase->left;
+				}
+				to_erase->left->parent = to_parent;
+			}
+		}
+		else {
+			Tree<T>* next = to_erase->next();
+			to_erase->data = next->data;
+			if (next == next->parent->left) {
+				next->parent->left = next->right;
+				if (next->right != nullptr) {
+					next->right->parent = next->parent;
+				}
+			}
+			else {
+				next->parent->right = next->right;
+				if (next->right != nullptr) {
+					next->right->parent = next->parent;
+				}
+			}
+			delete next;
+		}
+	}
+	void delete_left() {//Удаляет левое поддерево
+		if (left != NULL) {
+			left->delete_left();
+			left->delete_right();
+			delete left;
+		}
+	}
+	void delete_right() {//Удаляет правое поддерево
+		if (right != NULL) {
+			right->delete_right();
+			right->delete_left();
+			delete right;
+		}
+	}
+	void add_right(Tree<T>* temp) {//Функция, которая устанавливает правое поддерево
+		right = temp;
+	}
+	void add_left(Tree<T>* temp) {//Функция, которая устанавливает левое поддерево
+		left = temp;
+	}
+	Tree<T> search(T key) {//ищет узел по заданному ключу
+		if (data == key) {
+			return this;
+		}
+		if (left != nullptr) {
+			Tree<T>* result = left->search(key);
+			if (result != nullptr) {
+				return result;
+			}
+		}
+		if (right != nullptr) {
+			Tree<T>* result = right->search(key);
+			if (result != nullptr) {
+				return result;
+			}
+		}
+		return nullptr;
+	}
+	Tree<T> find(T data) {//Функция, которая ищет узел с исходным значением
+		if (this == nullptr || this->data == data) {
+			return this;
+		}
+		else if (data > this->data) {
+			return this->right->find(data);
+		}
+		else {
+			return this->left->find(data);
+		}
+	}
+
+	void direct_way(Tree<T>* current) {//Прямой обход дерева
+		if (current == nullptr) {
+			return;
+		}
+		else {
+			cout << current->get_data() << " ";
+			direct_way(current->get_left());
+			direct_way(current->get_right());
+		}
+	}
+
+
+	void symmetric_way(Tree<T>* tree) {//Симметричный обход дерева
+		if (tree != nullptr) {
+			symmetric_way(tree->left);
+			cout << tree->data << " ";
+			symmetric_way(tree->right);
+		}
+	}
+
+	void reverse_way(Tree<T>* tree) {//Обратный обход дерева
+		if (tree != nullptr) {
+			reverse_way(tree->left);
+			reverse_way(tree->right);
+			cout << tree->data << " ";
+		}
+	}
+	Tree<T>* balanced(int count) {//Функция, которая создаёт сбалансированное дерево с нужной высотой
+		if (count <= 0) {
+			return nullptr;
+		}
+		T data;
+		cout << "Введите данные для сбалансированного дерева: ";
+		cin >> data;
+		Tree<T>* temp = new Tree<T>(data);
+		temp->add_left(balanced(count / 2));
+		temp->add_right(balanced(count - count / 2 - 1));
+		return temp;
+	}
+	int getHeight() {//Функция, которая возвращает высоту дерева 
+		int h1 = 0, h2 = 0, hadd = 0;
+		if (this == NULL) {
+			return 0;
+		}
+		if (this->left != NULL) {
+			h1 = this->left->getHeight();
+		}
+		if (this->right != NULL) {
+			h2 = this->right->getHeight();
+		}
+		if (h1 >= h2) {
+			return h1 + 1;
+		}
+		else return h2 + 1;
+	}
+	int getAmountOfNodes() {//Функция, которая возвращает кол-во узлов в дереве
+		if (this == NULL) {
+			return 0;
+		}
+		if ((this->left == NULL) && (this->right == NULL)) {
+			return 1;
+		}
+		int l = 0;
+		int r = 0;
+		if (this->left != NULL) {
+			l = this->left->getAmountOfNodes();
+		}
+		if (this->right != NULL) {
+			r = this->right->getAmountOfNodes();
+		}
+		return (l + r + 1);
+	}
+	static Tree<T>* build_bst(const vector<T> data, int start, int end) {//Рекурсивная функции для постройки сбалансированного дерева
+		if (start > end) {
+			return nullptr;
+		}
+		int mid = start + (end - start) / 2;
+		Tree<T>* new_node = new Tree<T>(data[mid]);
+		new_node->left = build_bst(data, start, mid - 1);
+		new_node->right = build_bst(data, mid + 1, end);
+		return new_node;
+	}
+	void in_order_traversal(vector<T>& result) {//Обход дерева в порядке возрастания и сохранение значений в векторе
+		if (left != nullptr) {
+			left->in_order_traversal(result);
+		}
+		result.push_back(data);
+		if (right != nullptr) {
+			right->in_order_traversal(result);
+		}
+	}
+	static Tree<T>* create_bst(Tree<T>* root) {//Фунция для создания дерева поиска из сбалансированного дерева 
+		vector<T> sorted_data;
+		root->in_order_traversal(sorted_data);
+		return build_bst(sorted_data, 0, sorted_data.size() - 1);
+	}
+	friend void reshape(int height, int width);
+	friend void display();
+
+
+	void drawTree(int argc, char** argv, int win_height, int win_width);
+	friend void LevelCounter(Tree* root);
+	friend void CountLevels(Tree* root, void(*LevelConter)(Tree* root));
+	friend void Coords(Tree* node);
+	friend void CoordsCalculate(Tree* node, void(*Coords)(Tree* node));
+	friend void DrawOneNode(Tree* root);
+	friend void DrawNodes(Tree* root, void (*DrawOneNode)(Tree* root));
+	friend void DrawOneLine(Tree* root);
+	friend void DrawLines(Tree* root, void (*DrawOneLine)(Tree* root));
+};
+int depth = 0, width = 0;
+Tree<double>* tree = new Tree<double>(1.2);
+float RadiusA = 0.5;
+void reshape(int height, int width);
+void display();
+void Tree<double>::drawTree(int argc, char** argv, int win_height, int win_width) {
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(win_height, win_width);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+	glutCreateWindow("Tree");
+	glutReshapeFunc(reshape);
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
+
+void LevelCounter(Tree<double>* root) {
+	if (root->parent != NULL) {
+		root->level = root->parent->level + 1;
+	}
+	if (depth < root->level) {
+		depth = root->level;
+	}
+}
+void CountLevels(Tree<double>* root, void(*LevelConter)(Tree<double>* root)) {
+	if (root == NULL) {
+		return;
+	}
+	(LevelCounter)(root);
+	CountLevels(root->left, LevelConter);
+	CountLevels(root->right, LevelConter);
+}
+void Coords(Tree<double>* node) {
+	if (node->parent != NULL) {
+		if (node->level == 2) {
+			node->x = node->parent->x + node->state * (pow(2, depth - 1) / 2);
+		}
+		else
+			node->x = node->parent->x + node->state * (pow(2, depth - 1) / pow(2, node->level - 1));
+		node->y = node->parent->y - 1;
+	}
+}
+void CoordsCalculate(Tree<double>* node, void(*Coords)(Tree<double>* node)) {
+	if (node == NULL) {
+		return;
+	}
+	(*Coords)(node);
+	if (node->left != NULL) {
+		node->left->state = -1;
+		CoordsCalculate(node->left, Coords);
+	}
+	if (node->right != NULL) {
+		node->right->state = 1;
+		CoordsCalculate(node->right, Coords);
+	}
+	return;
+}
+void DrawCircle(char colour, GLfloat x, GLfloat y, float radiusB, int count) {
+	glColor3f(75.0, 0.0, 130.0);
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(x, y);
+	for (int i = 0; i <= count; i++) {
+		glVertex2f(
+			(x + (RadiusA * cos(i * 2 * M_PI / count))),
+			(y + (radiusB * sin(i * 2 * M_PI / count)))
+		);
+	}
+	glEnd();
+}
+
+void DrawOutline(float tmp_x, float tmp_y, float radiusB) {
+	glColor3f(75.0, 0.0, 130.0);
+	glBegin(GL_POINTS);
+	for (int i = 0; i < RadiusA; i++) {
+		for (int j = 0; j <= 540; j++) {
+			tmp_x = RadiusA * sin(j) + tmp_x;
+			tmp_y = radiusB * cos(j) + tmp_y;
+			glVertex2f(tmp_x - 0.35, tmp_y - 0.1);
+		}
+	}
+	glEnd();
+}
+void drawNode(const char* str, GLfloat x, GLfloat y, char colour) {
+	double c = 0;
+	c = (4 + depth) / pow(2, depth);
+	float radiusB = c * RadiusA;
+	int count = 50;
+	DrawCircle('g', x, y, radiusB, RadiusA);
+	DrawOutline(x, y, radiusB);
+	glColor3f(0.0, 0.0, 0.0);
+	glRasterPos2f(x - 0.05, y - 0.05);
+	const char* p;
+	for (p = str; *p != '\0'; p++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *p);
+	}
+
+}
+
+
+
+void DrawOneLine(Tree<double>* root) {
+	if (root->parent != NULL) {
+		glBegin(GL_LINES);
+		glVertex2d(root->parent->x, root->parent->y);
+		glVertex2d(root->x, root->y);
+		glEnd();
+	}
+}
+void DrawLines(Tree<double>* root, void (*DrawOneLine)(Tree<double>* root)) {
+	if (root == NULL) {
+		return;
+	}
+	(*DrawOneLine)(root);
+	DrawLines(root->left, DrawOneLine);
+	DrawLines(root->right, DrawOneLine);
+}
+void DrawOneNode(Tree<double>* root) {
+	char colour;
+	if (root->parent != NULL) {
+		colour = 'g';
+		drawNode(to_string(root->data).c_str(), root->x, root->y, colour);
+	}
+
+}
+void DrawNodes(Tree<double>* root, void (*DrawOneNode)(Tree<double>* root)) {
+	char colour;
+	if (root == NULL) {
+		return;
+	}
+	colour = 'g';
+	(*DrawOneNode)(root);
+	DrawNodes(root->left, DrawOneNode);
+	DrawNodes(root->right, DrawOneNode);
+	drawNode(to_string(tree->data).c_str(), tree->x, tree->y, colour);
+}
+void reshape(int height, int width) {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glViewport(0, 0, height, width);
+	gluOrtho2D(-pow(2, depth - 1), pow(2, depth - 1), -depth, 5);
+}
+void display() {
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.0, 250.0, 250.0);
+	glLineWidth(1);
+	DrawLines(tree, DrawOneLine);
+	DrawNodes(tree, DrawOneNode);
+	glutSwapBuffers();
+}
+void PrintingInfo() {
+	depth = tree->getHeight();
+	width = pow(2, depth - 1);
+	cout << "Глубина дерева: " << depth << endl;
+	cout << "Ширина дерева: " << width << endl;
+}
+
+int main(int argc, char** argv) {
+	system("chcp 1251>NULL");
+	tree->insert_left(2.3);
+	tree->insert_right(3.7);
+	tree->get_left()->insert_left(4.3);
+	tree->get_left()->insert_right(7.8);
+	tree->get_right()->insert_left(9.7);
+	tree->get_right()->insert_right(5.6);
+	PrintingInfo();
+	CountLevels(tree, LevelCounter);
+	CoordsCalculate(tree, Coords);
+	tree->drawTree(argc, argv, 960, 720);
+	return 0;
+}
