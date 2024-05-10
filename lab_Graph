@@ -1,0 +1,555 @@
+Graph.h:
+#pragma once
+#include <vector>
+#include <iostream>
+#include <queue>
+#include <string> 
+using namespace std;
+
+template<class T>
+class Graph
+{
+private:
+	int maxSize;
+	vector <vector<int>> adjMatrix;
+	vector<T> vertList;
+	queue<T> VertsQueue;
+	vector<T> labelList;
+public:
+	inline Graph<T>(const int& Vsize)// Конструктор, который инициализирует значения объектов класса Graph
+	{
+		this->maxSize = Vsize;
+		this->adjMatrix = vector<vector<T>>(Vsize, vector<T>(Vsize));
+		for (int i = 0; i < maxSize; i++)
+		{
+			for (int j = 0; j < this->maxSize; j++)
+			{
+				this->adjMatrix[i][j] = 0;
+			}
+		}
+	}
+
+	~Graph()// Деструктор
+	{
+	}
+
+	inline int GetVertPos(const T& vertex)// Получает индекс вершин
+	{
+		for (int i = 0; i < this->vertList.size(); i++)
+		{
+			if (this->vertList[i] == vertex)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	inline bool IsEmpty()// Проверка, является ли граф пустым
+	{
+		return this->vertList.size() == 0;
+	}
+
+	inline bool IsFull()// Проверка, заполнен ли граф
+	{
+		return this->vertList.size() == this->maxSize;
+	}
+
+	inline int GetAmountVerts()// Возвращает количество вершин
+	{
+		return this->vertList.size();
+	}
+
+	int GetAmountEdges()// Получение количества ребер
+	{
+		int amount = 0;
+		if (!this->IsEmpty())
+		{
+			for (int i = 0, vertListSize = this->vertList.size(); i < vertListSize; i++)
+			{
+				for (int j = 0; j < vertListSize; j++)
+				{
+					if (this->adjMatrix[i][j] != 0)
+					{
+						amount++;
+					}
+				}
+			}
+		}
+		return amount / 2;
+	}
+
+	inline int GetWeight(const T& vertex1, const T& vertex2)// Возвращает веса между вершинами
+	{
+		if (!this->IsEmpty())
+		{
+			return 0;
+		}
+		int vert_1 = this->GetVertPos(vertex1);
+		int vert_2 = this->GetVertPos(vertex2);
+		if (vertex1 == -1 || vertex2 == -1)
+		{
+			cout << "Одного из выбранных узлов в графе не существует." << endl;
+			return 0;
+		}
+		return this->adjMatrix[vert_1][vert_2];
+	}
+
+	vector<T> GetNbrs(const T& vertex)// Получение вектора соседей
+	{
+		vector<T> nbrsList;
+		int pos = this->GetVertPos(vertex);
+		if (pos != (-1))
+		{
+			for (int i = 0, vertListSize = this->vertList.size(); i < vertListSize; i++)
+			{
+				if (this->adjMatrix[pos][i] != 0)
+				{
+					nbrsList.push_back(this->vertList[i]);
+				}
+			}
+		}
+		return nbrsList;
+	}
+
+	inline void InsertVertex(const T& vertex)// Добавление вершины
+	{
+		if (!this->IsFull())
+		{
+			this->vertList.push_back(vertex);
+		}
+		else
+		{
+			cout << "Граф уже заполнен. Невозможно добавить новую вершину." << endl;
+			return;
+		}
+	}
+
+	void InsertEdge(const T& vertex1, const T& vertex2, int weight = 1)// Вставка ребра
+	{
+		if (this->GetVertPos(vertex1) != (-1) && this->GetVertPos(vertex2) != (-1))
+		{
+			int vertPos1 = GetVertPos(vertex1);
+			int vertPos2 = GetVertPos(vertex2);
+			if (this->adjMatrix[vertPos1][vertPos2] != 0 && this->adjMatrix[vertPos2][vertPos1] != 0)
+			{
+				cout << "Ребро между этими вершинами уже существует" << endl;
+				return;
+			}
+			else
+			{
+				this->adjMatrix[vertPos1][vertPos2] = weight;
+				this->adjMatrix[vertPos2][vertPos1] = weight;
+			}
+		}
+		else
+		{
+			cout << "Обеих вершин (или одной из них) нет в графе" << endl;
+			return;
+		}
+	}
+
+	void Print()// Печать матрицы смежности графа
+	{
+		int vertListSize = this->vertList.size();
+		if (!this->IsEmpty()) 
+		{
+			cout << "Матрица смежности: " << endl;
+			for (int i = 0; i < vertListSize; ++i) 
+			{
+				cout << this->vertList[i] << " ";
+				for (int j = 0; j < vertListSize; ++j) 
+				{
+					cout << " " << this->adjMatrix[i][j] << " ";
+				}
+				cout << endl;
+			}
+		}
+		else
+		{
+			cout << "Граф пуст" << endl;
+		}
+	}
+
+	T& Front()// Возвращает первый элемент в очереди
+	{
+		return VertsQueue.front();
+	}
+
+	void removeVertex(const T& vertex)// Удаление вершины
+	{
+		int pos = GetVertPos(vertex);
+		if (pos == -1)
+		{
+			cout << "Вершины " << vertex << " нет в графе." << endl;
+			return;
+		}
+		for (int i = 0; i < maxSize; i++)
+		{
+			if (adjMatrix[pos][i] != 0)
+			{
+				removeEdge(vertex, vertList[i]);
+			}
+			if (adjMatrix[i][pos] != 0)
+			{
+				removeEdge(vertList[i], vertex);
+			}
+		}
+		vertList.erase(vertList.begin() + pos);
+		for (int i = 0; i < maxSize; i++)
+		{
+			adjMatrix[i].erase(adjMatrix[i].begin() + pos);
+		}
+		adjMatrix.erase(adjMatrix.begin() + pos);
+		maxSize--;
+		cout << "Вершина " << vertex << " удалена." << endl;
+	}
+
+	void removeEdge(const T& vertex1, const T& vertex2)// Удаление ребра
+	{
+		int pos1 = GetVertPos(vertex1);
+		int pos2 = GetVertPos(vertex2);
+		if (pos1 == -1 || pos2 == -1)
+		{
+			cout << "Одной из вершин нет в графе." << endl;
+			return;
+		}
+		if (adjMatrix[pos1][pos2] == 0)
+		{
+			cout << "Ребра между вершинами " << vertex1 << " и " << vertex2 << " нет." << endl;
+			return;
+		}
+		adjMatrix[pos1][pos2] = 0;
+		adjMatrix[pos2][pos1] = 0;
+		cout << "Ребро между вершинами " << vertex1 << " и " << vertex2 << " удалено." << endl;
+	}
+
+	void editEdgeWeight(const T& vertex1, const T& vertex2, int newWeight)// Измена веса между ребрами
+	{
+		int pos1 = GetVertPos(vertex1);
+		int pos2 = GetVertPos(vertex2);
+		if (pos1 == -1 || pos2 == -1)
+		{
+			cout << "Одной из вершин нет в графе." << endl;
+			return;
+		}
+		if (adjMatrix[pos1][pos2] == 0)
+		{
+			cout << "Ребра между вершинами " << vertex1 << " и " << vertex2 << " нет." << endl;
+			return;
+		}
+		adjMatrix[pos1][pos2] = newWeight;
+		adjMatrix[pos2][pos1] = newWeight;
+		cout << "Вес ребра между вершинами " << vertex1 << " и " << vertex2 << " изменен на " << newWeight << " ." << endl;
+	}
+
+	void obhGlub(T& startVertex, bool* visitedVerts)// Обход графа в глубину
+	{
+		cout << "Вершина " << startVertex << "посещена." << endl;
+		visitedVerts[this->GetVertPos(startVertex)] = true;
+		vector<T>neighbors = this->GetNbrs(startVertex);
+		for (int i = 0; i < neighbors.size(); i++)
+		{
+			if (!visitedVerts[this->GetVertPos(neighbors[i])])
+			{
+				this->obhGlub(neighbors[i], visitedVerts);
+			}
+		}
+	}
+
+	void obhShir(T& startVertex, bool* visitedVerts)// Обход графа в ширину
+	{
+		if (visitedVerts[this->GetVertPos(startVertex)] == false)
+		{
+			this->vertList.push_back(startVertex);
+			cout << "Вершина " << startVertex << " обработана." << endl;
+			visitedVerts[this->GetVertPos(startVertex)] = true;
+		}
+		vector<T>neighbors = this->GetNbrs(startVertex);
+		this->vertList.pop_back();
+		for (int i = 0; i < neighbors.size(); i++)
+		{
+			if (!visitedVerts[this->GetVertPos(neighbors[i])])
+			{
+				this->vertList.push_back(neighbors[i]);
+				visitedVerts[this->GetVertPos(neighbors[i])] = true;
+				cout << "Вершина " << neighbors[i] << " обработана." << endl;
+			}
+		}
+		if (this->vertList.empty())
+		{
+			return;
+		}
+		obhShir(vertList.front(), visitedVerts);
+	}
+
+	void FillLabels(T& startVertex)
+	{
+		for (int i = 0; i < vertList.size(); i++)
+		{
+			labelList[i] = 1000000;
+		}
+		int pos = GetVertPos(startVertex);
+		labelList[pos] = 0;
+	}
+
+	bool AllVisited(vector<bool>& visitedVerts)
+	{
+		for (int i = 0; i < vertList.size(); i++)
+		{
+			if (!visitedVerts[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void Dikstra(const T& startVertex)
+	{
+		const int n = 100000;
+		int size = vertList.size();
+		int* min_d = new int[size];
+		int* count = new int[size];
+		int tmp, minIndex, min;
+		int begin_index = 0;
+		for (int i = 0; i < size; i++)
+		{
+			min_d[i] = n;
+			count[i] = 1;
+		}
+		min_d[begin_index] = 0;
+		do
+		{
+			minIndex = n;
+			min = n;
+			for (int i = 0; i < size; i++)
+			{
+				if ((count[i] == 1) && (min_d[i] < min))
+				{
+					min = min_d[i];
+					minIndex = i;
+				}
+			}
+			if (minIndex != n)
+			{
+				for (int i = 0; i < size; i++)
+				{
+					if (adjMatrix[minIndex][i] > 0)
+					{
+						tmp = min + adjMatrix[minIndex][i];
+						if (tmp < min_d[i])
+						{
+							min_d[i] = tmp;
+						}
+					}
+				}
+				count[minIndex] = 0;
+			}
+		} while (minIndex < n);
+		cout << endl << "Кратчайшие расстояния до вершин: " << endl << endl;
+		for (int i = 0; i < size; i++)
+		{
+			cout << "До " << (i + 1) << " вершины: ";
+			cout << " " << min_d[i] << endl << endl;
+		}
+		delete[] min_d;
+		delete[] count;
+	}
+
+	void Floida()
+	{
+		int n = this->GetAmountVerts();
+		int parent[n][n];
+
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (this->adjMatrix[i][j] != INFINITY && i != j)
+				{
+					parent[i][j] = i;
+				}
+				else
+				{
+					parent[i][j] = -1;
+				}
+			}
+		}
+
+		for (int k = 0; k < n; k++)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					if (this->adjMatrix[i][j] > this->adjMatrix[i][k] + this->adjMatrix[k][j])
+					{
+						this->adjMatrix[i][j] = this->adjMatrix[i][k] + this->adjMatrix[k][j];
+						parent[i][j] = parent[k][j];
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				cout << "Кратчайший путь между " << i << " и " << j << " это ";
+				if (this->adjMatrix[i][j] == INFINITY)
+				{
+					cout << "Бесконечность";
+				}
+				else
+				{
+					cout << this->adjMatrix[i][j] << " ";
+				}
+
+				cout << "";
+				printPath(parent[i][j], i, j);
+				cout << endl;
+			}
+		}
+	}
+
+	void printPath(int parent[], int i, int j)
+	{
+		if (i == j)
+		{
+			cout << i << " ";
+		}
+		else
+		{
+			if (parent[j] == -1)
+			{
+				cout << "No path exists";
+			}
+			else
+			{
+				printPath(parent, i, parent[i]);
+				cout << j << " ";
+			}
+		}
+	}
+};
+main.cpp:
+#include "Graf.h"
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <string>
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "RU");
+	Graph<int> graph(6);
+	int Verts, Edges, vertex, sourceVertex, targetVertex, Weight, vertex1;
+	bool* visitedVerts = new bool[6];
+	bool* visitedVerts1 = new bool[6];
+	fill(visitedVerts, visitedVerts + 20, false);
+
+	cout << "Количество вершин графа: ";
+	cin >> Verts;
+	cout << "Количество ребер графа: ";
+	cin >> Edges;
+	cout << endl;
+
+	for (int i = 0; i < Verts; i++)
+	{
+		cout << "Вершина: ";
+		cin >> vertex;
+		graph.InsertVertex(vertex);
+	}
+	cout << endl;
+
+	for (int i = 0; i < Edges; i++)
+	{
+		cout << "Исходная вершина: ";
+		cin >> sourceVertex;
+		cout << "Конечная вершина: ";
+		cin >> targetVertex;
+		cout << "Вес ребра: ";
+		cin >> Weight;
+		int* targetVerPtr = &targetVertex;
+		graph.InsertEdge(sourceVertex, targetVertex, Weight);
+	}
+	
+	cout << endl;
+	graph.Print();
+
+	int n;
+	cout << "Введите вершину, с которой начинается обход: ";
+	cin >> vertex;
+	cout << endl << "Обход в глубину: " << endl;
+	graph.obhGlub(vertex, visitedVerts);
+
+	cout << "Введите вершину, с которой начинается обход: ";
+	cin >> vertex;
+	cout << endl << "Обход в ширину: " << endl;
+	graph.obhGlub(vertex, visitedVerts);
+
+	cout << "Введите вершину, с которой начинается обход: ";
+	cin >> vertex;
+	cout << endl << "Обход Дейкстры: " << endl;
+	graph.Dikstra(vertex);
+
+	delete[]visitedVerts;
+	cout << "Введите вершину, которую нужно удалить: ";
+	cin >> n;
+	graph.removeVertex(n);
+	graph.Print();
+
+	cout << "Размер графа: " << graph.GetAmountVerts();
+	cout << endl;
+
+	int v, r;
+	cout << "Введите количество вершин, которые нужно добавить: ";
+	cin >> v;
+	cout << "Введите количество ребер, которые нужно добавить: ";
+	cin >> r;
+
+	for (int i = 0; i < v; i++)
+	{
+		cout << "Вершина: ";
+		cin >> vertex;
+		graph.InsertVertex(vertex);
+		cout << endl;
+	}
+
+	for (int i = 0; i < r; i++)
+	{
+		cout << "Исходная вершина: ";
+		cin >> sourceVertex;
+		cout << "Конечная вершина: ";
+		cin >> targetVertex;
+		cout << "Вес ребра: ";
+		cin >> Weight;
+		int* targetVerPtr = &targetVertex;
+		graph.InsertEdge(sourceVertex, targetVertex, Weight);
+	}
+
+	graph.Print();
+	cout << "Введите номера вершин, между которыми нужно удалить ребро: ";
+	cin >> vertex;
+	cin >> vertex1;
+	graph.removeEdge(vertex, vertex1);
+	cout << "Граф, после удаления ребра: " << endl;
+	graph.Print();
+	cout << endl << endl;
+
+	cout << "Введите номера вершин, между которыми нужно изменить вес ребра: ";
+	cin >> vertex;
+	cin >> vertex1;
+
+	cout << endl << endl << "";
+	cin >> Weight;
+	graph.editEdgeWeight(vertex, vertex1, Weight);
+	cout << "Граф, после удаления ребра: " << endl;
+	graph.Print();
+
+	cout << "Алгоритм Флойды: " << endl;
+	graph.Floida();
+
+	return 0;}
