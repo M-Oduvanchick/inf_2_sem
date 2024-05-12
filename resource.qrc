@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>imj/download_m_ls_products.jpg</file>
+    </qresource>
+</RCC>
